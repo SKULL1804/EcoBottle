@@ -1,0 +1,33 @@
+# FastAPI & Server
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+python-multipart==0.0.9
+
+# Database
+sqlalchemy[asyncio]==2.0.35
+aiosqlite==0.20.0
+# asyncpg — install saat pindah ke PostgreSQL: pip install asyncpg
+alembic==1.13.2
+
+# Auth & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.0
+
+# Validation & Settings
+pydantic==2.9.0
+pydantic-settings==2.5.0
+email-validator==2.2.0
+
+# AI & Image Processing (YOLOv8 — local inference, no API key needed)
+ultralytics>=8.2.0
+Pillow==10.4.0
+
+# Redis (optional for now)
+redis==5.1.0
+
+# HTTP Client
+httpx==0.27.0
+
+# Utils
+python-dotenv==1.0.1
