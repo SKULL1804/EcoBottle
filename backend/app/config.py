@@ -25,8 +25,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # Google AI Studio (Gemini Vision)
-    GOOGLE_AI_STUDIO_API_KEYS: str = ""
+    # SMTP Email (for OTP)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""  # Verified sender email in Brevo
 
     # File Upload
     UPLOAD_DIR: str = "./uploads"

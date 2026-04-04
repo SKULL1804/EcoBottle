@@ -31,6 +31,36 @@ class TokenRefresh(BaseModel):
     refresh_token: str
 
 
+# ─── OTP Schemas ──────────────────────────────────────────
+
+class OTPRequest(BaseModel):
+    """Request to send OTP code."""
+    email: EmailStr = Field(..., examples=["budi@gmail.com"])
+
+
+class OTPVerify(BaseModel):
+    """Verify OTP for registration."""
+    email: EmailStr = Field(..., examples=["budi@gmail.com"])
+    code: str = Field(..., min_length=6, max_length=6, examples=["123456"])
+
+
+class OTPResponse(BaseModel):
+    message: str
+    email: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    """Request password reset OTP."""
+    email: EmailStr = Field(..., examples=["budi@gmail.com"])
+
+
+class ResetPasswordRequest(BaseModel):
+    """Reset password with OTP."""
+    email: EmailStr = Field(..., examples=["budi@gmail.com"])
+    code: str = Field(..., min_length=6, max_length=6, examples=["123456"])
+    new_password: str = Field(..., min_length=6, max_length=128, examples=["newpassword123"])
+
+
 # ─── User Schemas ─────────────────────────────────────────
 
 class UserResponse(BaseModel):
@@ -38,6 +68,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     phone: str | None = None
+    is_verified: bool = False
     points: int = 0
     balance: Decimal = Decimal("0.00")
     created_at: datetime

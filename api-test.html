@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌿 EcoBottle — API Tester</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #0a0f0d;
@@ -28,7 +30,11 @@
             --radius: 12px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -38,21 +44,23 @@
             overflow-x: hidden;
         }
 
-        /* ── Animated background ── */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background: 
-                radial-gradient(ellipse 600px 400px at 20% 20%, rgba(16,185,129,0.06), transparent),
-                radial-gradient(ellipse 500px 500px at 80% 80%, rgba(20,184,166,0.04), transparent);
+            background: radial-gradient(ellipse 600px 400px at 20% 20%, rgba(16, 185, 129, 0.06), transparent), radial-gradient(ellipse 500px 500px at 80% 80%, rgba(20, 184, 166, 0.04), transparent);
             pointer-events: none;
             z-index: 0;
         }
 
-        .app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
 
-        /* ── Header ── */
         .header {
             display: flex;
             align-items: center;
@@ -61,6 +69,7 @@
             border-bottom: 1px solid var(--border);
             margin-bottom: 32px;
         }
+
         .header h1 {
             font-size: 28px;
             font-weight: 800;
@@ -69,14 +78,27 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
         }
-        .header .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 2px;
+        }
 
         .server-url {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .server-url label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+        .server-url label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
         .server-url input {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -88,9 +110,12 @@
             width: 260px;
             transition: border-color 0.2s;
         }
-        .server-url input:focus { outline: none; border-color: var(--green); }
 
-        /* ── Auth Bar ── */
+        .server-url input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
         .auth-bar {
             display: flex;
             align-items: center;
@@ -101,19 +126,32 @@
             border-radius: var(--radius);
             margin-bottom: 28px;
         }
+
         .auth-bar .status-dot {
-            width: 10px; height: 10px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: var(--red);
-            box-shadow: 0 0 8px rgba(248,113,113,0.4);
+            box-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
             transition: all 0.3s;
         }
+
         .auth-bar .status-dot.connected {
             background: var(--green);
-            box-shadow: 0 0 8px rgba(52,211,153,0.5);
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
         }
-        .auth-bar .status-text { font-size: 13px; color: var(--text-dim); flex: 1; }
-        .auth-bar .user-name { font-weight: 600; color: var(--green); }
+
+        .auth-bar .status-text {
+            font-size: 13px;
+            color: var(--text-dim);
+            flex: 1;
+        }
+
+        .auth-bar .user-name {
+            font-weight: 600;
+            color: var(--green);
+        }
+
         .auth-bar .balance-badge {
             font-size: 12px;
             background: var(--green-dark);
@@ -123,20 +161,22 @@
             font-weight: 600;
         }
 
-        /* ── Layout ── */
         .panels {
             display: grid;
             grid-template-columns: 280px 1fr;
             gap: 24px;
         }
 
-        /* ── Sidebar Nav ── */
         .sidebar {
             position: sticky;
             top: 24px;
             height: fit-content;
         }
-        .nav-group { margin-bottom: 20px; }
+
+        .nav-group {
+            margin-bottom: 20px;
+        }
+
         .nav-label {
             font-size: 10px;
             text-transform: uppercase;
@@ -146,6 +186,7 @@
             margin-bottom: 6px;
             font-weight: 700;
         }
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -159,12 +200,18 @@
             transition: all 0.15s;
             margin-bottom: 2px;
         }
-        .nav-item:hover { background: var(--surface); color: var(--text); }
-        .nav-item.active {
-            background: linear-gradient(135deg, rgba(52,211,153,0.12), rgba(20,184,166,0.08));
-            color: var(--green);
-            border: 1px solid rgba(52,211,153,0.15);
+
+        .nav-item:hover {
+            background: var(--surface);
+            color: var(--text);
         }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(20, 184, 166, 0.08));
+            color: var(--green);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+
         .nav-item .method {
             font-size: 9px;
             font-weight: 800;
@@ -173,12 +220,25 @@
             border-radius: 4px;
             font-family: monospace;
         }
-        .method.get { background: rgba(96,165,250,0.15); color: var(--blue); }
-        .method.post { background: rgba(52,211,153,0.15); color: var(--green); }
-        .method.put { background: rgba(251,191,36,0.15); color: var(--yellow); }
 
-        /* ── Main Content ── */
-        .main-content { min-width: 0; }
+        .method.get {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+        }
+
+        .method.post {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--green);
+        }
+
+        .method.put {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--yellow);
+        }
+
+        .main-content {
+            min-width: 0;
+        }
 
         .endpoint-card {
             display: none;
@@ -188,9 +248,22 @@
             overflow: hidden;
             animation: fadeIn 0.2s ease;
         }
-        .endpoint-card.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .endpoint-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .card-header {
             padding: 20px 24px;
@@ -199,13 +272,30 @@
             align-items: center;
             gap: 12px;
         }
-        .card-header h2 { font-size: 16px; font-weight: 700; flex: 1; }
-        .card-header .path { font-size: 12px; font-family: monospace; color: var(--text-muted); background: var(--bg); padding: 4px 10px; border-radius: 6px; }
 
-        .card-body { padding: 24px; }
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            flex: 1;
+        }
 
-        /* ── Form ── */
-        .form-group { margin-bottom: 16px; }
+        .card-header .path {
+            font-size: 12px;
+            font-family: monospace;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
         .form-group label {
             display: block;
             font-size: 11px;
@@ -215,7 +305,9 @@
             margin-bottom: 6px;
             font-weight: 600;
         }
-        .form-group input, .form-group textarea {
+
+        .form-group input,
+        .form-group textarea {
             width: 100%;
             background: var(--bg);
             border: 1px solid var(--border);
@@ -226,11 +318,19 @@
             font-size: 13px;
             transition: border-color 0.2s;
         }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--green); }
-        .form-group textarea { resize: vertical; min-height: 80px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* ── File Upload ── */
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
         .file-drop {
             border: 2px dashed var(--border);
             border-radius: var(--radius);
@@ -240,14 +340,40 @@
             transition: all 0.2s;
             background: var(--bg);
         }
-        .file-drop:hover, .file-drop.dragover { border-color: var(--green); background: rgba(52,211,153,0.03); }
-        .file-drop .icon { font-size: 36px; margin-bottom: 8px; }
-        .file-drop .text { font-size: 13px; color: var(--text-dim); }
-        .file-drop .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-        .file-drop input[type="file"] { display: none; }
-        .file-drop .preview { max-width: 200px; max-height: 150px; border-radius: 8px; margin-top: 10px; }
 
-        /* ── Buttons ── */
+        .file-drop:hover,
+        .file-drop.dragover {
+            border-color: var(--green);
+            background: rgba(52, 211, 153, 0.03);
+        }
+
+        .file-drop .icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .file-drop .text {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .file-drop .hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .file-drop input[type="file"] {
+            display: none;
+        }
+
+        .file-drop .preview {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -261,28 +387,46 @@
             border: none;
             transition: all 0.15s;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, var(--green-dim), var(--emerald));
             color: #fff;
-            box-shadow: 0 2px 12px rgba(34,197,94,0.25);
+            box-shadow: 0 2px 12px rgba(34, 197, 94, 0.25);
         }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34,197,94,0.35); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-danger {
-            background: rgba(248,113,113,0.1);
+            background: rgba(248, 113, 113, 0.1);
             color: var(--red);
-            border: 1px solid rgba(248,113,113,0.2);
+            border: 1px solid rgba(248, 113, 113, 0.2);
         }
-        .btn-danger:hover { background: rgba(248,113,113,0.18); }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.18);
+        }
+
         .btn-secondary {
             background: var(--surface2);
             color: var(--text-dim);
             border: 1px solid var(--border);
         }
 
-        .actions { display: flex; gap: 10px; margin-top: 20px; }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-        /* ── Response ── */
         .response-area {
             margin-top: 20px;
             background: var(--bg);
@@ -290,6 +434,7 @@
             border-radius: var(--radius);
             overflow: hidden;
         }
+
         .response-header {
             display: flex;
             align-items: center;
@@ -302,10 +447,25 @@
             color: var(--text-muted);
             font-weight: 700;
         }
-        .response-status { font-family: monospace; font-size: 13px; font-weight: 700; }
-        .response-status.s2xx { color: var(--green); }
-        .response-status.s4xx { color: var(--yellow); }
-        .response-status.s5xx { color: var(--red); }
+
+        .response-status {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .response-status.s2xx {
+            color: var(--green);
+        }
+
+        .response-status.s4xx {
+            color: var(--yellow);
+        }
+
+        .response-status.s5xx {
+            color: var(--red);
+        }
+
         .response-body {
             padding: 16px;
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -317,8 +477,10 @@
             color: var(--text-dim);
         }
 
-        /* ── Scan Results ── */
-        .scan-results { margin-top: 16px; }
+        .scan-results {
+            margin-top: 16px;
+        }
+
         .scan-result-item {
             display: flex;
             align-items: center;
@@ -329,27 +491,63 @@
             border-radius: 8px;
             margin-bottom: 8px;
         }
-        .scan-result-item .bottle-info { flex: 1; }
-        .scan-result-item .bottle-name { font-weight: 600; font-size: 14px; }
-        .scan-result-item .bottle-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .scan-result-item .bottle-price { font-weight: 700; color: var(--green); font-size: 15px; }
+
+        .scan-result-item .bottle-info {
+            flex: 1;
+        }
+
+        .scan-result-item .bottle-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .scan-result-item .bottle-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .scan-result-item .bottle-price {
+            font-weight: 700;
+            color: var(--green);
+            font-size: 15px;
+        }
 
         .scan-total {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
-            background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(20,184,166,0.05));
-            border: 1px solid rgba(52,211,153,0.15);
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(20, 184, 166, 0.05));
+            border: 1px solid rgba(52, 211, 153, 0.15);
             border-radius: var(--radius);
             margin-top: 12px;
         }
-        .scan-total .label { font-size: 13px; color: var(--text-dim); }
-        .scan-total .value { font-size: 22px; font-weight: 800; color: var(--green); }
-        .scan-total .points { font-size: 12px; color: var(--teal); margin-top: 2px; }
 
-        /* ── Toast ── */
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .scan-total .label {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .scan-total .value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .scan-total .points {
+            font-size: 12px;
+            color: var(--teal);
+            margin-top: 2px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
         .toast {
             padding: 12px 20px;
             border-radius: 10px;
@@ -357,719 +555,888 @@
             font-weight: 500;
             margin-bottom: 8px;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
-        .toast.success { background: var(--green-dark); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
-        .toast.error { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
-        .toast.info { background: #152040; color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
-        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } }
 
-        /* ── Loading Spinner ── */
+        .toast.success {
+            background: var(--green-dark);
+            color: var(--green);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .toast.error {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .toast.info {
+            background: #152040;
+            color: var(--blue);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+        }
+
         .spinner {
             display: inline-block;
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.2);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-        /* ── Responsive ── */
+        /* OTP Input */
+        .otp-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.05), rgba(20, 184, 166, 0.03));
+            border: 1px solid rgba(52, 211, 153, 0.15);
+            border-radius: var(--radius);
+        }
+
+        .otp-section h3 {
+            font-size: 14px;
+            color: var(--green);
+            margin-bottom: 12px;
+        }
+
+        .otp-section .otp-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .otp-inputs input {
+            width: 48px;
+            height: 56px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            font-family: monospace;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--green);
+            border-radius: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .otp-inputs input:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
         @media (max-width: 768px) {
-            .panels { grid-template-columns: 1fr; }
-            .sidebar { position: static; }
-            .form-row { grid-template-columns: 1fr; }
+            .panels {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="app">
-    <!-- Header -->
-    <div class="header">
-        <div>
-            <h1>🌿 EcoBottle API Tester</h1>
-            <div class="subtitle">Interactive test console for all backend endpoints</div>
+    <div class="app">
+        <div class="header">
+            <div>
+                <h1>🌿 EcoBottle API Tester</h1>
+                <div class="subtitle">Interactive test console for all backend endpoints</div>
+            </div>
+            <div class="server-url">
+                <label>Server</label>
+                <input type="text" id="baseUrl" value="http://localhost:8000" />
+            </div>
         </div>
-        <div class="server-url">
-            <label>Server</label>
-            <input type="text" id="baseUrl" value="http://localhost:8000" />
+
+        <div class="auth-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <div class="status-text" id="statusText">Belum login — Register atau Login untuk mulai</div>
+            <div class="balance-badge" id="balanceBadge" style="display:none">Rp0 · 0 poin</div>
+            <button class="btn btn-danger" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="panels">
+            <div class="sidebar">
+                <div class="nav-group">
+                    <div class="nav-label">🔐 Autentikasi</div>
+                    <div class="nav-item active" data-target="register" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Register + OTP
+                    </div>
+                    <div class="nav-item" data-target="login" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Login
+                    </div>
+                    <div class="nav-item" data-target="me" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Profile (Me)
+                    </div>
+                    <div class="nav-item" data-target="forgot" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Forgot Password
+                    </div>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-label">👤 User</div>
+                    <div class="nav-item" data-target="update-profile" onclick="switchTab(this)">
+                        <span class="method put">PUT</span> Update Profile
+                    </div>
+                    <div class="nav-item" data-target="balance" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Balance & Poin
+                    </div>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-label">🤖 AI Scanner</div>
+                    <div class="nav-item" data-target="scan" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Scan Botol
+                    </div>
+                    <div class="nav-item" data-target="confirm-scan" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Konfirmasi Scan
+                    </div>
+                    <div class="nav-item" data-target="scan-history" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Riwayat Scan
+                    </div>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-label">💰 Transaksi</div>
+                    <div class="nav-item" data-target="transactions" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Riwayat
+                    </div>
+                    <div class="nav-item" data-target="withdraw" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Pencairan
+                    </div>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-label">♻️ Master Data</div>
+                    <div class="nav-item" data-target="bottles" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Daftar Botol
+                    </div>
+                    <div class="nav-item" data-target="seed" onclick="switchTab(this)">
+                        <span class="method post">POST</span> Tambah Botol
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+
+                <!-- ═══ REGISTER + OTP ═══ -->
+                <div class="endpoint-card active" id="card-register">
+                    <div class="card-header">
+                        <span class="method post">POST</span>
+                        <h2>Register User Baru (2 Step)</h2>
+                        <span class="path">/api/v1/auth/register → /verify-otp</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Step 1: Register Form -->
+                        <div id="reg-step1">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" id="reg-name" placeholder="Budi Santoso" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="reg-email" placeholder="budi@gmail.com" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" id="reg-password" placeholder="Min 6 karakter" />
+                                </div>
+                                <div class="form-group">
+                                    <label>No. Telepon (opsional)</label>
+                                    <input type="text" id="reg-phone" placeholder="+6281234567890" />
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-primary" id="regBtn" onclick="doRegister()">📧 Register & Kirim
+                                    OTP</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: OTP Verification -->
+                        <div id="reg-step2" style="display:none">
+                            <div class="otp-section">
+                                <h3>📬 Kode OTP Terkirim!</h3>
+                                <div class="otp-hint">Masukkan 6 digit kode yang dikirim ke <strong
+                                        id="reg-otp-email"></strong></div>
+                                <div class="otp-inputs" id="reg-otp-inputs">
+                                    <input type="text" maxlength="1" data-idx="0" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                    <input type="text" maxlength="1" data-idx="1" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                    <input type="text" maxlength="1" data-idx="2" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                    <input type="text" maxlength="1" data-idx="3" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                    <input type="text" maxlength="1" data-idx="4" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                    <input type="text" maxlength="1" data-idx="5" oninput="otpInput(this,'reg')"
+                                        onkeydown="otpKeydown(event,this,'reg')" />
+                                </div>
+                                <div class="actions">
+                                    <button class="btn btn-primary" id="verifyRegBtn" onclick="verifyRegOTP()">✅
+                                        Verifikasi & Masuk</button>
+                                    <button class="btn btn-secondary" onclick="doRegister()">📧 Kirim Ulang OTP</button>
+                                    <button class="btn btn-danger" onclick="resetRegForm()">← Kembali</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="response-area" id="resp-register" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ LOGIN ═══ -->
+                <div class="endpoint-card" id="card-login">
+                    <div class="card-header">
+                        <span class="method post">POST</span>
+                        <h2>Login</h2>
+                        <span class="path">/api/v1/auth/login</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="login-email" placeholder="budi@gmail.com" />
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="login-password" placeholder="password" />
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="doLogin()">🔑 Login</button>
+                        </div>
+                        <div class="response-area" id="resp-login" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ ME ═══ -->
+                <div class="endpoint-card" id="card-me">
+                    <div class="card-header">
+                        <span class="method get">GET</span>
+                        <h2>Profile Saya</h2>
+                        <span class="path">/api/v1/auth/me</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="getMe()">👤 Get Profile</button>
+                        </div>
+                        <div class="response-area" id="resp-me" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ FORGOT PASSWORD ═══ -->
+                <div class="endpoint-card" id="card-forgot">
+                    <div class="card-header">
+                        <span class="method post">POST</span>
+                        <h2>🔒 Forgot / Reset Password</h2>
+                        <span class="path">/api/v1/auth/forgot-password → /reset-password</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Step 1: Request OTP -->
+                        <div id="forgot-step1">
+                            <div class="form-group">
+                                <label>Email akun yang lupa password</label>
+                                <input type="email" id="forgot-email" placeholder="budi@gmail.com" />
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-primary" id="forgotBtn" onclick="doForgotPassword()">📧 Kirim
+                                    Kode Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: OTP + New Password -->
+                        <div id="forgot-step2" style="display:none">
+                            <div class="otp-section">
+                                <h3>📬 Kode Reset Terkirim!</h3>
+                                <div class="otp-hint">Masukkan kode OTP dari email <strong
+                                        id="forgot-otp-email"></strong></div>
+                                <div class="otp-inputs" id="forgot-otp-inputs">
+                                    <input type="text" maxlength="1" data-idx="0" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                    <input type="text" maxlength="1" data-idx="1" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                    <input type="text" maxlength="1" data-idx="2" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                    <input type="text" maxlength="1" data-idx="3" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                    <input type="text" maxlength="1" data-idx="4" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                    <input type="text" maxlength="1" data-idx="5" oninput="otpInput(this,'forgot')"
+                                        onkeydown="otpKeydown(event,this,'forgot')" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Password Baru</label>
+                                    <input type="password" id="forgot-new-password" placeholder="Min 6 karakter" />
+                                </div>
+                                <div class="actions">
+                                    <button class="btn btn-primary" onclick="doResetPassword()">🔑 Reset
+                                        Password</button>
+                                    <button class="btn btn-secondary" onclick="doForgotPassword()">📧 Kirim
+                                        Ulang</button>
+                                    <button class="btn btn-danger" onclick="resetForgotForm()">← Kembali</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="response-area" id="resp-forgot" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ UPDATE PROFILE ═══ -->
+                <div class="endpoint-card" id="card-update-profile">
+                    <div class="card-header">
+                        <span class="method put">PUT</span>
+                        <h2>Update Profile</h2>
+                        <span class="path">/api/v1/users/profile</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nama Baru</label>
+                                <input type="text" id="upd-name" placeholder="Nama baru" />
+                            </div>
+                            <div class="form-group">
+                                <label>No. Telepon Baru</label>
+                                <input type="text" id="upd-phone" placeholder="+628xxx" />
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="updateProfile()">✏️ Update</button>
+                        </div>
+                        <div class="response-area" id="resp-update-profile" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ BALANCE ═══ -->
+                <div class="endpoint-card" id="card-balance">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>Saldo & Poin</h2><span class="path">/api/v1/users/balance</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getBalance()">💰 Cek
+                                Saldo</button></div>
+                        <div class="response-area" id="resp-balance" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ SCAN ═══ -->
+                <div class="endpoint-card" id="card-scan">
+                    <div class="card-header"><span class="method post">POST</span>
+                        <h2>⭐ AI Scan Botol</h2><span class="path">/api/v1/scan/analyze</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="file-drop" id="fileDrop" onclick="document.getElementById('scanFile').click()">
+                            <div class="icon">📸</div>
+                            <div class="text">Klik atau drag foto botol ke sini</div>
+                            <div class="hint">JPG, PNG, atau WebP — Maks 10MB</div>
+                            <input type="file" id="scanFile" accept="image/jpeg,image/png,image/webp"
+                                onchange="handleFileSelect(event)" />
+                            <img id="imagePreview" class="preview" style="display:none" />
+                        </div>
+                        <div class="actions"><button class="btn btn-primary" id="scanBtn" onclick="doScan()" disabled>🤖
+                                Analisis dengan AI</button></div>
+                        <div id="scanResultsUI"></div>
+                        <div class="response-area" id="resp-scan" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ CONFIRM SCAN ═══ -->
+                <div class="endpoint-card" id="card-confirm-scan">
+                    <div class="card-header"><span class="method post">POST</span>
+                        <h2>Konfirmasi Scan</h2><span class="path">/api/v1/scan/{id}/confirm</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label>Scan ID</label><input type="text" id="confirm-scan-id"
+                                placeholder="UUID dari hasil scan" /></div>
+                        <div class="actions"><button class="btn btn-primary" onclick="confirmScan()">✅ Konfirmasi
+                                Setoran</button></div>
+                        <div class="response-area" id="resp-confirm-scan" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ SCAN HISTORY ═══ -->
+                <div class="endpoint-card" id="card-scan-history">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>Riwayat Scan</h2><span class="path">/api/v1/scan/history</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getScanHistory()">📋 Load
+                                Riwayat</button></div>
+                        <div class="response-area" id="resp-scan-history" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ TRANSACTIONS ═══ -->
+                <div class="endpoint-card" id="card-transactions">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>Riwayat Transaksi</h2><span class="path">/api/v1/transactions</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getTransactions()">📊 Load
+                                Transaksi</button></div>
+                        <div class="response-area" id="resp-transactions" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ WITHDRAW ═══ -->
+                <div class="endpoint-card" id="card-withdraw">
+                    <div class="card-header"><span class="method post">POST</span>
+                        <h2>Pencairan Saldo</h2><span class="path">/api/v1/transactions/withdraw</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group"><label>Jumlah Pencairan (Rp)</label><input type="number"
+                                id="withdraw-amount" placeholder="5000" min="1000" /></div>
+                        <div class="actions"><button class="btn btn-primary" onclick="doWithdraw()">💸 Cairkan</button>
+                        </div>
+                        <div class="response-area" id="resp-withdraw" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ BOTTLES ═══ -->
+                <div class="endpoint-card" id="card-bottles">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>Daftar Jenis Botol & Harga</h2><span class="path">/api/v1/bottles</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getBottles()">♻️ Load Daftar
+                                Botol</button></div>
+                        <div id="bottlesUI"></div>
+                        <div class="response-area" id="resp-bottles" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ ADD BOTTLE ═══ -->
+                <div class="endpoint-card" id="card-seed">
+                    <div class="card-header"><span class="method post">POST</span>
+                        <h2>Tambah Jenis Botol</h2><span class="path">/api/v1/bottles</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Nama</label><input type="text" id="bottle-name"
+                                    placeholder="Botol PET 600ml" /></div>
+                            <div class="form-group"><label>Material</label><input type="text" id="bottle-material"
+                                    placeholder="PET / Glass / Aluminium / HDPE" /></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Harga (Rp)</label><input type="number" id="bottle-price"
+                                    placeholder="200" /></div>
+                            <div class="form-group"><label>Volume (ml)</label><input type="number" id="bottle-volume"
+                                    placeholder="600" /></div>
+                        </div>
+                        <div class="actions"><button class="btn btn-primary" onclick="addBottle()">➕ Tambah</button>
+                        </div>
+                        <div class="response-area" id="resp-seed" style="display:none"></div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
-    <!-- Auth Status Bar -->
-    <div class="auth-bar">
-        <div class="status-dot" id="statusDot"></div>
-        <div class="status-text" id="statusText">Belum login — Register atau Login untuk mulai</div>
-        <div class="balance-badge" id="balanceBadge" style="display:none">Rp0 · 0 poin</div>
-        <button class="btn btn-danger" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
-    </div>
+    <div class="toast-container" id="toastContainer"></div>
 
-    <div class="panels">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="nav-group">
-                <div class="nav-label">🔐 Autentikasi</div>
-                <div class="nav-item active" data-target="register" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Register
-                </div>
-                <div class="nav-item" data-target="login" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Login
-                </div>
-                <div class="nav-item" data-target="me" onclick="switchTab(this)">
-                    <span class="method get">GET</span> Profile (Me)
-                </div>
-            </div>
-            <div class="nav-group">
-                <div class="nav-label">👤 User</div>
-                <div class="nav-item" data-target="update-profile" onclick="switchTab(this)">
-                    <span class="method put">PUT</span> Update Profile
-                </div>
-                <div class="nav-item" data-target="balance" onclick="switchTab(this)">
-                    <span class="method get">GET</span> Balance & Poin
-                </div>
-            </div>
-            <div class="nav-group">
-                <div class="nav-label">🤖 AI Scanner</div>
-                <div class="nav-item" data-target="scan" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Scan Botol
-                </div>
-                <div class="nav-item" data-target="confirm-scan" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Konfirmasi Scan
-                </div>
-                <div class="nav-item" data-target="scan-history" onclick="switchTab(this)">
-                    <span class="method get">GET</span> Riwayat Scan
-                </div>
-            </div>
-            <div class="nav-group">
-                <div class="nav-label">💰 Transaksi</div>
-                <div class="nav-item" data-target="transactions" onclick="switchTab(this)">
-                    <span class="method get">GET</span> Riwayat
-                </div>
-                <div class="nav-item" data-target="withdraw" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Pencairan
-                </div>
-            </div>
-            <div class="nav-group">
-                <div class="nav-label">♻️ Master Data</div>
-                <div class="nav-item" data-target="bottles" onclick="switchTab(this)">
-                    <span class="method get">GET</span> Daftar Botol
-                </div>
-                <div class="nav-item" data-target="seed" onclick="switchTab(this)">
-                    <span class="method post">POST</span> Tambah Botol
-                </div>
-            </div>
-        </div>
+    <script>
+        // ─── State ───
+        let accessToken = localStorage.getItem('eco_token') || '';
+        let currentUser = null;
+        let lastScanId = '';
+        let pendingRegEmail = '';
+        let pendingForgotEmail = '';
 
-        <!-- Main Content -->
-        <div class="main-content">
+        if (accessToken) getMe(true);
 
-            <!-- Register -->
-            <div class="endpoint-card active" id="card-register">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>Register User Baru</h2>
-                    <span class="path">/api/v1/auth/register</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nama Lengkap</label>
-                            <input type="text" id="reg-name" placeholder="Budi Santoso" value="Test User" />
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="reg-email" placeholder="budi@gmail.com" value="test@eco.com" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" id="reg-password" placeholder="Min 6 karakter" value="password123" />
-                        </div>
-                        <div class="form-group">
-                            <label>No. Telepon (opsional)</label>
-                            <input type="text" id="reg-phone" placeholder="+6281234567890" />
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="doRegister()">🚀 Register</button>
-                    </div>
-                    <div class="response-area" id="resp-register" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Login -->
-            <div class="endpoint-card" id="card-login">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>Login</h2>
-                    <span class="path">/api/v1/auth/login</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="login-email" placeholder="budi@gmail.com" value="test@eco.com" />
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" id="login-password" placeholder="password" value="password123" />
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="doLogin()">🔑 Login</button>
-                    </div>
-                    <div class="response-area" id="resp-login" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Me -->
-            <div class="endpoint-card" id="card-me">
-                <div class="card-header">
-                    <span class="method get">GET</span>
-                    <h2>Profile Saya</h2>
-                    <span class="path">/api/v1/auth/me</span>
-                </div>
-                <div class="card-body">
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="getMe()">👤 Get Profile</button>
-                    </div>
-                    <div class="response-area" id="resp-me" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Update Profile -->
-            <div class="endpoint-card" id="card-update-profile">
-                <div class="card-header">
-                    <span class="method put">PUT</span>
-                    <h2>Update Profile</h2>
-                    <span class="path">/api/v1/users/profile</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nama Baru</label>
-                            <input type="text" id="upd-name" placeholder="Nama baru" />
-                        </div>
-                        <div class="form-group">
-                            <label>No. Telepon Baru</label>
-                            <input type="text" id="upd-phone" placeholder="+628xxx" />
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="updateProfile()">✏️ Update</button>
-                    </div>
-                    <div class="response-area" id="resp-update-profile" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Balance -->
-            <div class="endpoint-card" id="card-balance">
-                <div class="card-header">
-                    <span class="method get">GET</span>
-                    <h2>Saldo & Poin</h2>
-                    <span class="path">/api/v1/users/balance</span>
-                </div>
-                <div class="card-body">
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="getBalance()">💰 Cek Saldo</button>
-                    </div>
-                    <div class="response-area" id="resp-balance" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Scan -->
-            <div class="endpoint-card" id="card-scan">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>⭐ AI Scan Botol</h2>
-                    <span class="path">/api/v1/scan/analyze</span>
-                </div>
-                <div class="card-body">
-                    <div class="file-drop" id="fileDrop" onclick="document.getElementById('scanFile').click()">
-                        <div class="icon">📸</div>
-                        <div class="text">Klik atau drag foto botol ke sini</div>
-                        <div class="hint">JPG, PNG, atau WebP — Maks 10MB</div>
-                        <input type="file" id="scanFile" accept="image/jpeg,image/png,image/webp" onchange="handleFileSelect(event)" />
-                        <img id="imagePreview" class="preview" style="display:none" />
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" id="scanBtn" onclick="doScan()" disabled>🤖 Analisis dengan AI</button>
-                    </div>
-                    <div id="scanResultsUI"></div>
-                    <div class="response-area" id="resp-scan" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Confirm Scan -->
-            <div class="endpoint-card" id="card-confirm-scan">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>Konfirmasi Scan</h2>
-                    <span class="path">/api/v1/scan/{id}/confirm</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Scan ID</label>
-                        <input type="text" id="confirm-scan-id" placeholder="UUID dari hasil scan" />
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="confirmScan()">✅ Konfirmasi Setoran</button>
-                    </div>
-                    <div class="response-area" id="resp-confirm-scan" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Scan History -->
-            <div class="endpoint-card" id="card-scan-history">
-                <div class="card-header">
-                    <span class="method get">GET</span>
-                    <h2>Riwayat Scan</h2>
-                    <span class="path">/api/v1/scan/history</span>
-                </div>
-                <div class="card-body">
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="getScanHistory()">📋 Load Riwayat</button>
-                    </div>
-                    <div class="response-area" id="resp-scan-history" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Transactions -->
-            <div class="endpoint-card" id="card-transactions">
-                <div class="card-header">
-                    <span class="method get">GET</span>
-                    <h2>Riwayat Transaksi</h2>
-                    <span class="path">/api/v1/transactions</span>
-                </div>
-                <div class="card-body">
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="getTransactions()">📊 Load Transaksi</button>
-                    </div>
-                    <div class="response-area" id="resp-transactions" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Withdraw -->
-            <div class="endpoint-card" id="card-withdraw">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>Pencairan Saldo</h2>
-                    <span class="path">/api/v1/transactions/withdraw</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Jumlah Pencairan (Rp)</label>
-                        <input type="number" id="withdraw-amount" placeholder="5000" min="1000" />
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="doWithdraw()">💸 Cairkan</button>
-                    </div>
-                    <div class="response-area" id="resp-withdraw" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Bottles -->
-            <div class="endpoint-card" id="card-bottles">
-                <div class="card-header">
-                    <span class="method get">GET</span>
-                    <h2>Daftar Jenis Botol & Harga</h2>
-                    <span class="path">/api/v1/bottles</span>
-                </div>
-                <div class="card-body">
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="getBottles()">♻️ Load Daftar Botol</button>
-                    </div>
-                    <div id="bottlesUI"></div>
-                    <div class="response-area" id="resp-bottles" style="display:none"></div>
-                </div>
-            </div>
-
-            <!-- Add Bottle -->
-            <div class="endpoint-card" id="card-seed">
-                <div class="card-header">
-                    <span class="method post">POST</span>
-                    <h2>Tambah Jenis Botol</h2>
-                    <span class="path">/api/v1/bottles</span>
-                </div>
-                <div class="card-body">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" id="bottle-name" placeholder="Botol PET 600ml" />
-                        </div>
-                        <div class="form-group">
-                            <label>Material</label>
-                            <input type="text" id="bottle-material" placeholder="PET / Glass / Aluminium / HDPE" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Harga (Rp)</label>
-                            <input type="number" id="bottle-price" placeholder="200" />
-                        </div>
-                        <div class="form-group">
-                            <label>Volume (ml)</label>
-                            <input type="number" id="bottle-volume" placeholder="600" />
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="addBottle()">➕ Tambah</button>
-                    </div>
-                    <div class="response-area" id="resp-seed" style="display:none"></div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
-
-<script>
-    // ─── State ───
-    let accessToken = localStorage.getItem('eco_token') || '';
-    let currentUser = null;
-    let lastScanId = '';
-
-    // Init
-    if (accessToken) {
-        getMe(true);
-    }
-
-    // ─── Navigation ───
-    function switchTab(el) {
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.querySelectorAll('.endpoint-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('card-' + el.dataset.target).classList.add('active');
-    }
-
-    // ─── API Helper ───
-    function getBase() { return document.getElementById('baseUrl').value.replace(/\/$/, ''); }
-
-    async function api(method, path, body = null, isFormData = false) {
-        const url = getBase() + path;
-        const headers = {};
-        if (accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
-        if (!isFormData && body) headers['Content-Type'] = 'application/json';
-
-        const opts = { method, headers };
-        if (body) opts.body = isFormData ? body : JSON.stringify(body);
-
-        const res = await fetch(url, opts);
-        const data = await res.json();
-        return { status: res.status, data };
-    }
-
-    function showResponse(id, status, data) {
-        const area = document.getElementById('resp-' + id);
-        area.style.display = 'block';
-        const sClass = status < 300 ? 's2xx' : status < 500 ? 's4xx' : 's5xx';
-        area.innerHTML = `
-            <div class="response-header">
-                <span>Response</span>
-                <span class="response-status ${sClass}">${status}</span>
-            </div>
-            <div class="response-body">${JSON.stringify(data, null, 2)}</div>
-        `;
-    }
-
-    function toast(msg, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const t = document.createElement('div');
-        t.className = 'toast ' + type;
-        t.textContent = msg;
-        container.appendChild(t);
-        setTimeout(() => t.remove(), 3500);
-    }
-
-    function updateAuthUI() {
-        const dot = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-        const badge = document.getElementById('balanceBadge');
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        if (accessToken && currentUser) {
-            dot.classList.add('connected');
-            text.innerHTML = `Login sebagai <span class="user-name">${currentUser.name}</span> (${currentUser.email})`;
-            badge.style.display = 'inline-block';
-            badge.textContent = `Rp${Number(currentUser.balance).toLocaleString('id')} · ${currentUser.points} poin`;
-            logoutBtn.style.display = 'inline-flex';
-        } else {
-            dot.classList.remove('connected');
-            text.textContent = 'Belum login — Register atau Login untuk mulai';
-            badge.style.display = 'none';
-            logoutBtn.style.display = 'none';
+        // ─── Navigation ───
+        function switchTab(el) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.endpoint-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('card-' + el.dataset.target).classList.add('active');
         }
-    }
 
-    // ─── Auth ───
-    async function doRegister() {
-        const body = {
-            name: document.getElementById('reg-name').value,
-            email: document.getElementById('reg-email').value,
-            password: document.getElementById('reg-password').value,
-        };
-        const phone = document.getElementById('reg-phone').value;
-        if (phone) body.phone = phone;
+        // ─── API Helper ───
+        function getBase() { return document.getElementById('baseUrl').value.replace(/\/$/, ''); }
 
-        try {
-            const { status, data } = await api('POST', '/api/v1/auth/register', body);
-            showResponse('register', status, data);
-            if (status === 201) {
-                accessToken = data.access_token;
-                localStorage.setItem('eco_token', accessToken);
-                toast('✅ Registrasi berhasil!');
-                await getMe(true);
+        async function api(method, path, body = null, isFormData = false) {
+            const url = getBase() + path;
+            const headers = {};
+            if (accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
+            if (!isFormData && body) headers['Content-Type'] = 'application/json';
+            const opts = { method, headers };
+            if (body) opts.body = isFormData ? body : JSON.stringify(body);
+            const res = await fetch(url, opts);
+            const data = await res.json();
+            return { status: res.status, data };
+        }
+
+        function showResponse(id, status, data) {
+            const area = document.getElementById('resp-' + id);
+            area.style.display = 'block';
+            const sClass = status < 300 ? 's2xx' : status < 500 ? 's4xx' : 's5xx';
+            area.innerHTML = `<div class="response-header"><span>Response</span><span class="response-status ${sClass}">${status}</span></div><div class="response-body">${JSON.stringify(data, null, 2)}</div>`;
+        }
+
+        function toast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+
+        function updateAuthUI() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const badge = document.getElementById('balanceBadge');
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (accessToken && currentUser) {
+                dot.classList.add('connected');
+                text.innerHTML = `Login sebagai <span class="user-name">${currentUser.name}</span> (${currentUser.email})`;
+                badge.style.display = 'inline-block';
+                badge.textContent = `Rp${Number(currentUser.balance).toLocaleString('id')} · ${currentUser.points} poin`;
+                logoutBtn.style.display = 'inline-flex';
             } else {
-                toast(data.detail || 'Registrasi gagal', 'error');
+                dot.classList.remove('connected');
+                text.textContent = 'Belum login — Register atau Login untuk mulai';
+                badge.style.display = 'none';
+                logoutBtn.style.display = 'none';
             }
-        } catch (e) { toast('❌ Gagal terhubung ke server', 'error'); }
-    }
+        }
 
-    async function doLogin() {
-        const body = {
-            email: document.getElementById('login-email').value,
-            password: document.getElementById('login-password').value,
-        };
-        try {
-            const { status, data } = await api('POST', '/api/v1/auth/login', body);
-            showResponse('login', status, data);
-            if (status === 200) {
-                accessToken = data.access_token;
-                localStorage.setItem('eco_token', accessToken);
-                toast('✅ Login berhasil!');
-                await getMe(true);
-            } else {
-                toast(data.detail || 'Login gagal', 'error');
+        // ─── OTP Input Helpers ───
+        function otpInput(el, prefix) {
+            el.value = el.value.replace(/\D/g, '');
+            if (el.value && el.dataset.idx < 5) {
+                const inputs = document.querySelectorAll(`#${prefix}-otp-inputs input`);
+                inputs[parseInt(el.dataset.idx) + 1].focus();
             }
-        } catch (e) { toast('❌ Gagal terhubung ke server', 'error'); }
-    }
-
-    async function getMe(silent = false) {
-        try {
-            const { status, data } = await api('GET', '/api/v1/auth/me');
-            if (!silent) showResponse('me', status, data);
-            if (status === 200) {
-                currentUser = data;
-                updateAuthUI();
-                if (!silent) toast('Profile loaded');
+        }
+        function otpKeydown(event, el, prefix) {
+            if (event.key === 'Backspace' && !el.value && el.dataset.idx > 0) {
+                const inputs = document.querySelectorAll(`#${prefix}-otp-inputs input`);
+                inputs[parseInt(el.dataset.idx) - 1].focus();
             }
-        } catch (e) { if (!silent) toast('❌ Gagal memuat profile', 'error'); }
-    }
+        }
+        function getOTPValue(prefix) {
+            const inputs = document.querySelectorAll(`#${prefix}-otp-inputs input`);
+            return Array.from(inputs).map(i => i.value).join('');
+        }
+        function clearOTP(prefix) {
+            document.querySelectorAll(`#${prefix}-otp-inputs input`).forEach(i => i.value = '');
+        }
 
-    function logout() {
-        accessToken = '';
-        currentUser = null;
-        localStorage.removeItem('eco_token');
-        updateAuthUI();
-        toast('Logged out', 'info');
-    }
+        // ─── REGISTER (2-step) ───
+        async function doRegister() {
+            const body = {
+                name: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value,
+            };
+            const phone = document.getElementById('reg-phone').value;
+            if (phone) body.phone = phone;
 
-    // ─── User ───
-    async function updateProfile() {
-        const body = {};
-        const name = document.getElementById('upd-name').value;
-        const phone = document.getElementById('upd-phone').value;
-        if (name) body.name = name;
-        if (phone) body.phone = phone;
+            const btn = document.getElementById('regBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Mengirim OTP...';
 
-        const { status, data } = await api('PUT', '/api/v1/users/profile', body);
-        showResponse('update-profile', status, data);
-        if (status === 200) {
-            currentUser = data;
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/register', body);
+                showResponse('register', status, data);
+                if (status === 201) {
+                    pendingRegEmail = body.email;
+                    document.getElementById('reg-step1').style.display = 'none';
+                    document.getElementById('reg-step2').style.display = 'block';
+                    document.getElementById('reg-otp-email').textContent = body.email;
+                    clearOTP('reg');
+                    document.querySelector('#reg-otp-inputs input').focus();
+                    toast('📧 Kode OTP terkirim ke email!');
+                } else {
+                    toast(data.detail || 'Registrasi gagal', 'error');
+                }
+            } catch (e) { toast('❌ Gagal terhubung ke server', 'error'); }
+            btn.disabled = false;
+            btn.innerHTML = '📧 Register & Kirim OTP';
+        }
+
+        async function verifyRegOTP() {
+            const code = getOTPValue('reg');
+            if (code.length !== 6) { toast('Masukkan 6 digit kode OTP', 'error'); return; }
+
+            const btn = document.getElementById('verifyRegBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Memverifikasi...';
+
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/verify-otp', {
+                    email: pendingRegEmail,
+                    code: code,
+                });
+                showResponse('register', status, data);
+                if (status === 200 && data.access_token) {
+                    accessToken = data.access_token;
+                    localStorage.setItem('eco_token', accessToken);
+                    toast('✅ Akun terverifikasi & login berhasil!');
+                    await getMe(true);
+                    resetRegForm();
+                } else {
+                    toast(data.detail || 'Verifikasi gagal', 'error');
+                    clearOTP('reg');
+                }
+            } catch (e) { toast('❌ Gagal memverifikasi', 'error'); }
+            btn.disabled = false;
+            btn.innerHTML = '✅ Verifikasi & Masuk';
+        }
+
+        function resetRegForm() {
+            document.getElementById('reg-step1').style.display = 'block';
+            document.getElementById('reg-step2').style.display = 'none';
+            clearOTP('reg');
+        }
+
+        // ─── LOGIN ───
+        async function doLogin() {
+            const body = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value,
+            };
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/login', body);
+                showResponse('login', status, data);
+                if (status === 200) {
+                    accessToken = data.access_token;
+                    localStorage.setItem('eco_token', accessToken);
+                    toast('✅ Login berhasil!');
+                    await getMe(true);
+                } else {
+                    toast(data.detail || 'Login gagal', 'error');
+                }
+            } catch (e) { toast('❌ Gagal terhubung ke server', 'error'); }
+        }
+
+        async function getMe(silent = false) {
+            try {
+                const { status, data } = await api('GET', '/api/v1/auth/me');
+                if (!silent) showResponse('me', status, data);
+                if (status === 200) { currentUser = data; updateAuthUI(); if (!silent) toast('Profile loaded'); }
+            } catch (e) { if (!silent) toast('❌ Gagal memuat profile', 'error'); }
+        }
+
+        function logout() {
+            accessToken = '';
+            currentUser = null;
+            localStorage.removeItem('eco_token');
             updateAuthUI();
-            toast('✅ Profile diperbarui');
-        } else { toast(data.detail || 'Gagal', 'error'); }
-    }
-
-    async function getBalance() {
-        const { status, data } = await api('GET', '/api/v1/users/balance');
-        showResponse('balance', status, data);
-        if (status === 200) {
-            if (currentUser) {
-                currentUser.balance = data.balance;
-                currentUser.points = data.points;
-                updateAuthUI();
-            }
-            toast(`Saldo: Rp${Number(data.balance).toLocaleString('id')} · ${data.points} poin`, 'info');
-        }
-    }
-
-    // ─── Scanner ───
-    let selectedFile = null;
-
-    function handleFileSelect(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        selectedFile = file;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const preview = document.getElementById('imagePreview');
-            preview.src = ev.target.result;
-            preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-        document.getElementById('scanBtn').disabled = false;
-        document.querySelector('#fileDrop .text').textContent = file.name;
-    }
-
-    // Drag & drop
-    const fileDrop = document.getElementById('fileDrop');
-    fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
-    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
-    fileDrop.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileDrop.classList.remove('dragover');
-        if (e.dataTransfer.files.length) {
-            document.getElementById('scanFile').files = e.dataTransfer.files;
-            handleFileSelect({ target: { files: e.dataTransfer.files } });
-        }
-    });
-
-    async function doScan() {
-        if (!selectedFile) { toast('Pilih foto terlebih dahulu', 'error'); return; }
-        if (!accessToken) { toast('Login terlebih dahulu', 'error'); return; }
-
-        const btn = document.getElementById('scanBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Menganalisis...';
-
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-
-        try {
-            const { status, data } = await api('POST', '/api/v1/scan/analyze', formData, true);
-            showResponse('scan', status, data);
-
-            if (status === 200 && data.detected) {
-                lastScanId = data.scan_id;
-                document.getElementById('confirm-scan-id').value = lastScanId;
-                renderScanResults(data);
-                toast(`🤖 Terdeteksi ${data.total_items} botol!`);
-            } else {
-                toast(data.detail || 'Scan gagal', 'error');
-            }
-        } catch (e) {
-            toast('❌ Gagal mengirim scan', 'error');
+            toast('Logged out', 'info');
         }
 
-        btn.disabled = false;
-        btn.innerHTML = '🤖 Analisis dengan AI';
-    }
+        // ─── FORGOT / RESET PASSWORD ───
+        async function doForgotPassword() {
+            const email = document.getElementById('forgot-email').value;
+            if (!email) { toast('Masukkan email', 'error'); return; }
 
-    function renderScanResults(data) {
-        let html = '<div class="scan-results">';
-        for (const b of data.detected) {
-            html += `
-                <div class="scan-result-item">
-                    <div class="bottle-info">
-                        <div class="bottle-name">${b.brand} (${b.type.replace('_', ' ')})</div>
-                        <div class="bottle-meta">${b.volume_estimate}ml · Qty: ${b.quantity} · Confidence: ${(b.confidence * 100).toFixed(0)}%</div>
-                    </div>
-                    <div class="bottle-price">Rp${Number(b.subtotal).toLocaleString('id')}</div>
-                </div>
-            `;
+            const btn = document.getElementById('forgotBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Mengirim...';
+
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/forgot-password', { email });
+                showResponse('forgot', status, data);
+                if (status === 200) {
+                    pendingForgotEmail = email;
+                    document.getElementById('forgot-step1').style.display = 'none';
+                    document.getElementById('forgot-step2').style.display = 'block';
+                    document.getElementById('forgot-otp-email').textContent = email;
+                    clearOTP('forgot');
+                    document.querySelector('#forgot-otp-inputs input').focus();
+                    toast('📧 Kode reset terkirim!');
+                } else {
+                    toast(data.detail || 'Gagal', 'error');
+                }
+            } catch (e) { toast('❌ Gagal mengirim', 'error'); }
+            btn.disabled = false;
+            btn.innerHTML = '📧 Kirim Kode Reset';
         }
-        html += `
-            <div class="scan-total">
-                <div>
-                    <div class="label">Total Nilai</div>
-                    <div class="points">+${data.total_points} poin</div>
-                </div>
-                <div class="value">Rp${Number(data.total_value).toLocaleString('id')}</div>
-            </div>
-        `;
-        html += '</div>';
-        document.getElementById('scanResultsUI').innerHTML = html;
-    }
 
-    async function confirmScan() {
-        const scanId = document.getElementById('confirm-scan-id').value;
-        if (!scanId) { toast('Masukkan Scan ID', 'error'); return; }
+        async function doResetPassword() {
+            const code = getOTPValue('forgot');
+            const newPassword = document.getElementById('forgot-new-password').value;
+            if (code.length !== 6) { toast('Masukkan 6 digit kode OTP', 'error'); return; }
+            if (newPassword.length < 6) { toast('Password minimal 6 karakter', 'error'); return; }
 
-        const { status, data } = await api('POST', `/api/v1/scan/${scanId}/confirm`);
-        showResponse('confirm-scan', status, data);
-        if (status === 200) {
-            toast(`✅ ${data.message}`);
-            if (currentUser) {
-                currentUser.balance = data.new_balance;
-                currentUser.points = data.new_points;
-                updateAuthUI();
-            }
-        } else { toast(data.detail || 'Gagal konfirmasi', 'error'); }
-    }
-
-    async function getScanHistory() {
-        const { status, data } = await api('GET', '/api/v1/scan/history');
-        showResponse('scan-history', status, data);
-        if (status === 200) toast(`📋 ${data.total} scan ditemukan`, 'info');
-    }
-
-    // ─── Transactions ───
-    async function getTransactions() {
-        const { status, data } = await api('GET', '/api/v1/transactions');
-        showResponse('transactions', status, data);
-        if (status === 200) toast(`📊 ${data.total} transaksi`, 'info');
-    }
-
-    async function doWithdraw() {
-        const amount = parseFloat(document.getElementById('withdraw-amount').value);
-        if (!amount || amount < 1000) { toast('Minimal pencairan Rp1.000', 'error'); return; }
-
-        const { status, data } = await api('POST', '/api/v1/transactions/withdraw', { amount });
-        showResponse('withdraw', status, data);
-        if (status === 200) {
-            toast(`💸 ${data.message}`);
-            if (currentUser) {
-                currentUser.balance = data.new_balance;
-                updateAuthUI();
-            }
-        } else { toast(data.detail || 'Pencairan gagal', 'error'); }
-    }
-
-    // ─── Bottles ───
-    async function getBottles() {
-        const { status, data } = await api('GET', '/api/v1/bottles');
-        showResponse('bottles', status, data);
-        if (status === 200 && Array.isArray(data)) {
-            let html = '<div class="scan-results" style="margin-top:16px">';
-            for (const b of data) {
-                html += `
-                    <div class="scan-result-item">
-                        <div class="bottle-info">
-                            <div class="bottle-name">${b.name}</div>
-                            <div class="bottle-meta">${b.material || '-'} · ${b.volume_ml || '-'}ml</div>
-                        </div>
-                        <div class="bottle-price">Rp${Number(b.price_idr).toLocaleString('id')}</div>
-                    </div>
-                `;
-            }
-            html += '</div>';
-            document.getElementById('bottlesUI').innerHTML = html;
-            toast(`♻️ ${data.length} jenis botol`, 'info');
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/reset-password', {
+                    email: pendingForgotEmail,
+                    code: code,
+                    new_password: newPassword,
+                });
+                showResponse('forgot', status, data);
+                if (status === 200) {
+                    toast('✅ Password berhasil direset!');
+                    resetForgotForm();
+                } else {
+                    toast(data.detail || 'Reset gagal', 'error');
+                    clearOTP('forgot');
+                }
+            } catch (e) { toast('❌ Gagal mereset', 'error'); }
         }
-    }
 
-    async function addBottle() {
-        const body = {
-            name: document.getElementById('bottle-name').value,
-            material: document.getElementById('bottle-material').value,
-            price_idr: parseFloat(document.getElementById('bottle-price').value),
-            volume_ml: parseInt(document.getElementById('bottle-volume').value) || null,
-        };
-        const { status, data } = await api('POST', '/api/v1/bottles', body);
-        showResponse('seed', status, data);
-        if (status === 201) toast('✅ Botol ditambahkan'); else toast(data.detail || 'Gagal', 'error');
-    }
-</script>
+        function resetForgotForm() {
+            document.getElementById('forgot-step1').style.display = 'block';
+            document.getElementById('forgot-step2').style.display = 'none';
+            clearOTP('forgot');
+        }
+
+        // ─── User ───
+        async function updateProfile() {
+            const body = {};
+            const name = document.getElementById('upd-name').value;
+            const phone = document.getElementById('upd-phone').value;
+            if (name) body.name = name;
+            if (phone) body.phone = phone;
+            const { status, data } = await api('PUT', '/api/v1/users/profile', body);
+            showResponse('update-profile', status, data);
+            if (status === 200) { currentUser = data; updateAuthUI(); toast('✅ Profile diperbarui'); }
+            else toast(data.detail || 'Gagal', 'error');
+        }
+
+        async function getBalance() {
+            const { status, data } = await api('GET', '/api/v1/users/balance');
+            showResponse('balance', status, data);
+            if (status === 200) {
+                if (currentUser) { currentUser.balance = data.balance; currentUser.points = data.points; updateAuthUI(); }
+                toast(`Saldo: Rp${Number(data.balance).toLocaleString('id')} · ${data.points} poin`, 'info');
+            }
+        }
+
+        // ─── Scanner ───
+        let selectedFile = null;
+        function handleFileSelect(e) {
+            const file = e.target.files[0]; if (!file) return;
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (ev) => { const p = document.getElementById('imagePreview'); p.src = ev.target.result; p.style.display = 'block'; };
+            reader.readAsDataURL(file);
+            document.getElementById('scanBtn').disabled = false;
+            document.querySelector('#fileDrop .text').textContent = file.name;
+        }
+        const fileDrop = document.getElementById('fileDrop');
+        fileDrop.addEventListener('dragover', (e) => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+        fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+        fileDrop.addEventListener('drop', (e) => {
+            e.preventDefault(); fileDrop.classList.remove('dragover');
+            if (e.dataTransfer.files.length) { document.getElementById('scanFile').files = e.dataTransfer.files; handleFileSelect({ target: { files: e.dataTransfer.files } }); }
+        });
+
+        async function doScan() {
+            if (!selectedFile) { toast('Pilih foto terlebih dahulu', 'error'); return; }
+            if (!accessToken) { toast('Login terlebih dahulu', 'error'); return; }
+            const btn = document.getElementById('scanBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Menganalisis...';
+            const formData = new FormData(); formData.append('file', selectedFile);
+            try {
+                const { status, data } = await api('POST', '/api/v1/scan/analyze', formData, true);
+                showResponse('scan', status, data);
+                if (status === 200 && data.detected) {
+                    lastScanId = data.scan_id;
+                    document.getElementById('confirm-scan-id').value = lastScanId;
+                    renderScanResults(data);
+                    toast(`🤖 Terdeteksi ${data.total_items} botol!`);
+                } else { toast(data.detail || 'Scan gagal', 'error'); }
+            } catch (e) { toast('❌ Gagal mengirim scan', 'error'); }
+            btn.disabled = false; btn.innerHTML = '🤖 Analisis dengan AI';
+        }
+
+        function renderScanResults(data) {
+            let html = '<div class="scan-results">';
+            for (const b of data.detected) {
+                html += `<div class="scan-result-item"><div class="bottle-info"><div class="bottle-name">${b.brand} (${b.type.replace('_', ' ')})</div><div class="bottle-meta">${b.volume_estimate}ml · Qty: ${b.quantity} · Confidence: ${(b.confidence * 100).toFixed(0)}%</div></div><div class="bottle-price">Rp${Number(b.subtotal).toLocaleString('id')}</div></div>`;
+            }
+            html += `<div class="scan-total"><div><div class="label">Total Nilai</div><div class="points">+${data.total_points} poin</div></div><div class="value">Rp${Number(data.total_value).toLocaleString('id')}</div></div></div>`;
+            document.getElementById('scanResultsUI').innerHTML = html;
+        }
+
+        async function confirmScan() {
+            const scanId = document.getElementById('confirm-scan-id').value;
+            if (!scanId) { toast('Masukkan Scan ID', 'error'); return; }
+            const { status, data } = await api('POST', `/api/v1/scan/${scanId}/confirm`);
+            showResponse('confirm-scan', status, data);
+            if (status === 200) { toast(`✅ ${data.message}`); if (currentUser) { currentUser.balance = data.new_balance; currentUser.points = data.new_points; updateAuthUI(); } }
+            else toast(data.detail || 'Gagal konfirmasi', 'error');
+        }
+
+        async function getScanHistory() { const { status, data } = await api('GET', '/api/v1/scan/history'); showResponse('scan-history', status, data); if (status === 200) toast(`📋 ${data.total} scan ditemukan`, 'info'); }
+        async function getTransactions() { const { status, data } = await api('GET', '/api/v1/transactions'); showResponse('transactions', status, data); if (status === 200) toast(`📊 ${data.total} transaksi`, 'info'); }
+
+        async function doWithdraw() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value);
+            if (!amount || amount < 1000) { toast('Minimal pencairan Rp1.000', 'error'); return; }
+            const { status, data } = await api('POST', '/api/v1/transactions/withdraw', { amount });
+            showResponse('withdraw', status, data);
+            if (status === 200) { toast(`💸 ${data.message}`); if (currentUser) { currentUser.balance = data.new_balance; updateAuthUI(); } }
+            else toast(data.detail || 'Pencairan gagal', 'error');
+        }
+
+        async function getBottles() {
+            const { status, data } = await api('GET', '/api/v1/bottles');
+            showResponse('bottles', status, data);
+            if (status === 200 && Array.isArray(data)) {
+                let html = '<div class="scan-results" style="margin-top:16px">';
+                for (const b of data) html += `<div class="scan-result-item"><div class="bottle-info"><div class="bottle-name">${b.name}</div><div class="bottle-meta">${b.material || '-'} · ${b.volume_ml || '-'}ml</div></div><div class="bottle-price">Rp${Number(b.price_idr).toLocaleString('id')}</div></div>`;
+                html += '</div>';
+                document.getElementById('bottlesUI').innerHTML = html;
+                toast(`♻️ ${data.length} jenis botol`, 'info');
+            }
+        }
+
+        async function addBottle() {
+            const body = { name: document.getElementById('bottle-name').value, material: document.getElementById('bottle-material').value, price_idr: parseFloat(document.getElementById('bottle-price').value), volume_ml: parseInt(document.getElementById('bottle-volume').value) || null };
+            const { status, data } = await api('POST', '/api/v1/bottles', body);
+            showResponse('seed', status, data);
+            if (status === 201) toast('✅ Botol ditambahkan'); else toast(data.detail || 'Gagal', 'error');
+        }
+    </script>
 </body>
+
 </html>
