@@ -1,0 +1,67 @@
+import type { PaymentMethod, WithdrawOption, WalletTransaction } from "@/types/wallet";
+
+/* ─── Payment Methods ─── */
+export const PAYMENT_METHODS: PaymentMethod[] = [
+  { icon: "account_balance", name: "GoPay", connected: true, balance: "Rp 150.000" },
+  { icon: "payments", name: "OVO", connected: true, balance: "Rp 85.000" },
+  { icon: "shopping_bag", name: "ShopeePay", connected: false },
+  { icon: "credit_card", name: "DANA", connected: false },
+];
+
+/* ─── Withdraw Options ─── */
+export const WITHDRAW_OPTIONS: WithdrawOption[] = [
+  { icon: "bolt", label: "Instant", fee: "Rp 1.000", duration: "< 1 menit" },
+  { icon: "schedule", label: "Regular", fee: "Gratis", duration: "1-2 hari kerja" },
+];
+
+/* ─── Wallet Transactions ─── */
+export const WALLET_TRANSACTIONS: WalletTransaction[] = [
+  {
+    icon: "recycling",
+    label: "Botol PET 600ml",
+    date: "Hari ini, 14:20",
+    amount: "+Rp 500",
+    status: "completed",
+    type: "credit",
+  },
+  {
+    icon: "recycling",
+    label: "Botol Kaca 330ml",
+    date: "Hari ini, 10:45",
+    amount: "+Rp 1.200",
+    status: "completed",
+    type: "credit",
+  },
+  {
+    icon: "send",
+    label: "Withdraw ke GoPay",
+    date: "Kemarin, 18:00",
+    amount: "-Rp 15.000",
+    status: "completed",
+    type: "withdraw",
+  },
+  {
+    icon: "recycling",
+    label: "Botol PET 1.5L",
+    date: "Kemarin, 09:30",
+    amount: "+Rp 750",
+    status: "completed",
+    type: "credit",
+  },
+  {
+    icon: "shopping_bag",
+    label: "Voucher Alfamart",
+    date: "2 Apr 2026",
+    amount: "-Rp 10.000",
+    status: "completed",
+    type: "debit",
+  },
+  {
+    icon: "send",
+    label: "Withdraw ke OVO",
+    date: "1 Apr 2026",
+    amount: "-Rp 20.000",
+    status: "pending",
+    type: "withdraw",
+  },
+];

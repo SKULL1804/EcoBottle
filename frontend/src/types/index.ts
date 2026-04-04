@@ -20,3 +20,29 @@ export interface NavLink {
   href: string;
   active?: boolean;
 }
+
+/** Sidebar navigation item for dashboard. */
+export interface SideNavItem {
+  icon: string;
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+/** Bottom navigation item for mobile dashboard. */
+export interface BottomNavItem {
+  icon: string;
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+/** Transaction history item. */
+export interface Transaction {
+  icon: string;
+  label: string;
+  date: string;
+  amount: string;
+  status: string;
+  type: "credit" | "debit";
+}
