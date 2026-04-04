@@ -52,11 +52,16 @@ CLASS_TO_BRAND = {
 
 
 def _load_model() -> YOLO:
-    """Load YOLOv8 model (lazy singleton). Downloads on first run."""
+    """Load YOLOv8 model (lazy singleton). Downloads from HuggingFace on first run."""
     global _model
     if _model is None:
         print("🤖 Loading YOLOv8 waste detection model...")
-        _model = YOLO("kendrickfff/waste-classification-yolov8-ken")
+        from huggingface_hub import hf_hub_download
+        model_path = hf_hub_download(
+            repo_id="kendrickfff/waste-classification-yolov8-ken",
+            filename="yolov8n-waste-12cls-best.pt",
+        )
+        _model = YOLO(model_path)
         print("✅ Model loaded successfully!")
     return _model
 
