@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { USER_PROFILE } from "@/constants/profile";
 
 export default function EditProfileForm() {
@@ -16,7 +15,7 @@ export default function EditProfileForm() {
   const [saved, setSaved] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setSaved(false);
@@ -118,25 +117,6 @@ export default function EditProfileForm() {
               />
             </div>
           </div>
-
-          {/* Bio */}
-          <div>
-            <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
-              Bio
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-4 material-symbols-outlined text-outline text-lg">
-                description
-              </span>
-              <textarea
-                name="bio"
-                value={form.bio}
-                onChange={handleChange}
-                rows={3}
-                className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
-              />
-            </div>
-          </div>
         </div>
       </div>
 
@@ -193,12 +173,12 @@ export default function EditProfileForm() {
           </span>
           {saved ? "Tersimpan!" : "Simpan Perubahan"}
         </button>
-        <Link
+        {/* <Link
           href="/dashboard/profile"
           className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-colors text-center"
         >
           Batal
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

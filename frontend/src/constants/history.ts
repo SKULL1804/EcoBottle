@@ -4,7 +4,6 @@ import type { HistoryFilter, HistoryEntry } from "@/types/history";
 export const HISTORY_FILTERS: HistoryFilter[] = [
   { label: "Semua", value: "all", icon: "list" },
   { label: "Daur Ulang", value: "recycle", icon: "recycling" },
-  { label: "Voucher", value: "voucher", icon: "shopping_bag" },
   { label: "Withdraw", value: "withdraw", icon: "send" },
 ];
 

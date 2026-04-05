@@ -43,7 +43,7 @@ export default function PaymentMethods() {
                   {pm.name}
                 </p>
                 <p className="text-[11px] text-tertiary">
-                  {pm.connected ? pm.balance : "Belum terhubung"}
+                  {pm.connected ? pm.phone : "Belum terhubung"}
                 </p>
               </div>
             </div>

@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 export default function WalletBalance() {
   return (
-    <div className="bg-gradient-to-br from-on-primary-container to-primary rounded-2xl p-8 text-on-primary shadow-xl relative overflow-hidden">
+    <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-8 text-on-primary shadow-xl relative overflow-hidden">
       {/* Decorative blurs */}
       <div className="absolute -top-16 -right-16 w-48 h-48 bg-primary-fixed/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-surface-container-lowest/5 rounded-full blur-2xl" />
@@ -36,9 +38,12 @@ export default function WalletBalance() {
         </h2>
 
         <div className="grid grid-cols-3 gap-3">
-          <button className="py-3 bg-surface-container-lowest text-primary font-bold rounded-xl text-sm hover:scale-[1.03] active:scale-[0.97] transition-transform shadow-lg">
+          <Link
+            href="/dashboard/withdraw"
+            className="py-3 bg-surface-container-lowest text-primary font-bold rounded-xl text-sm hover:scale-[1.03] active:scale-[0.97] transition-transform shadow-lg text-center"
+          >
             Withdraw
-          </button>
+          </Link>
           <button className="py-3 bg-surface-container-lowest/15 backdrop-blur-sm text-on-primary font-bold rounded-xl text-sm hover:bg-surface-container-lowest/25 transition-colors">
             Top Up
           </button>
@@ -50,3 +55,4 @@ export default function WalletBalance() {
     </div>
   );
 }
+
