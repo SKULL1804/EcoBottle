@@ -1,8 +1,9 @@
 FROM python:3.13-slim
 
-# System dependencies for OpenCV (required by ultralytics/YOLOv8)
+# System dependencies for OpenCV (YOLOv8) + gcc for asyncpg build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 libsm6 libxext6 libxrender1 \
+    gcc python3-dev libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
