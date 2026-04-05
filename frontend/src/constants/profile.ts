@@ -21,11 +21,6 @@ export const SETTINGS_MENU: SettingsMenuItem[] = [
     href: "/dashboard/profile/edit",
   },
   {
-    icon: "notifications",
-    label: "Notifikasi",
-    description: "Atur preferensi notifikasi",
-  },
-  {
     icon: "lock",
     label: "Keamanan",
     description: "Password, 2FA, dan privasi",
@@ -35,11 +30,6 @@ export const SETTINGS_MENU: SettingsMenuItem[] = [
     icon: "language",
     label: "Bahasa",
     description: "Indonesia",
-  },
-  {
-    icon: "dark_mode",
-    label: "Tampilan",
-    description: "Mode terang / gelap",
   },
   {
     icon: "help",
@@ -55,15 +45,46 @@ export const SETTINGS_MENU: SettingsMenuItem[] = [
     icon: "logout",
     label: "Keluar",
     description: "Logout dari akun Anda",
+    href: "/",
     danger: true,
   },
 ];
 
 /* ─── Tier Progression ─── */
 export const TIERS: TierInfo[] = [
-  { name: "Bronze", icon: "shield", minBottles: 0, maxBottles: 25, current: false },
-  { name: "Silver", icon: "shield", minBottles: 26, maxBottles: 50, current: false },
-  { name: "Gold", icon: "military_tech", minBottles: 51, maxBottles: 100, current: false },
-  { name: "Premium", icon: "workspace_premium", minBottles: 101, maxBottles: 200, current: true },
-  { name: "Platinum", icon: "diamond", minBottles: 201, maxBottles: 500, current: false },
+  {
+    name: "Bronze",
+    icon: "shield",
+    minBottles: 0,
+    maxBottles: 25,
+    current: false,
+  },
+  {
+    name: "Silver",
+    icon: "shield",
+    minBottles: 26,
+    maxBottles: 50,
+    current: false,
+  },
+  {
+    name: "Gold",
+    icon: "military_tech",
+    minBottles: 51,
+    maxBottles: 100,
+    current: false,
+  },
+  {
+    name: "Premium",
+    icon: "workspace_premium",
+    minBottles: 101,
+    maxBottles: 200,
+    current: true,
+  },
+  {
+    name: "Platinum",
+    icon: "diamond",
+    minBottles: 201,
+    maxBottles: 500,
+    current: false,
+  },
 ];

@@ -8,7 +8,7 @@ export default function WalletBalance() {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-surface-container-lowest/15 rounded-xl backdrop-blur-sm">
+            <div className="p-2.5 bg-surface-container-lowest/15 rounded-xl backdrop-blur-sm flex items-center justify-center">
               <span
                 className="material-symbols-outlined text-2xl"
                 style={{ fontVariationSettings: '"FILL" 1' }}

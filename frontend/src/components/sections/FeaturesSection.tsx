@@ -7,7 +7,7 @@ export default function FeaturesSection() {
         Smart Tech for a Greener Planet
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-[800px]">
+      <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-200">
         {/* AI Detection (Large) */}
         <div className="md:col-span-2 md:row-span-1 bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden flex flex-col justify-end group">
           <Image
@@ -18,7 +18,7 @@ export default function FeaturesSection() {
             sizes="(max-width: 768px) 100vw, 50vw"
           />
           <div className="relative z-10">
-            <span className="material-symbols-outlined text-primary text-4xl mb-4">
+            <span className="material-symbols-outlined text-primary !text-4xl mb-4">
               visibility
             </span>
             <h4 className="text-3xl font-bold font-headline mb-2">
@@ -34,7 +34,7 @@ export default function FeaturesSection() {
         {/* Smart Wallet */}
         <div className="md:col-span-1 md:row-span-1 bg-primary text-on-primary p-10 rounded-xl flex flex-col justify-center">
           <span
-            className="material-symbols-outlined text-4xl mb-4"
+            className="material-symbols-outlined !text-4xl mb-4"
             style={{ fontVariationSettings: '"FILL" 1' }}
           >
             payments
@@ -50,7 +50,7 @@ export default function FeaturesSection() {
         {/* Gamification */}
         <div className="md:col-span-1 md:row-span-1 bg-surface-container-high p-10 rounded-xl flex flex-col justify-between">
           <h4 className="text-xl font-bold font-headline">Gamification</h4>
-          <span className="material-symbols-outlined text-primary text-6xl">
+          <span className="material-symbols-outlined text-primary !text-6xl">
             military_tech
           </span>
           <p className="text-tertiary text-sm">
@@ -61,7 +61,7 @@ export default function FeaturesSection() {
         {/* Eco Dashboard */}
         <div className="md:col-span-1 md:row-span-1 bg-surface-container-lowest p-10 rounded-xl flex flex-col justify-between border border-outline-variant/10">
           <div className="w-full h-32 bg-surface-container rounded-lg mb-4 flex items-center justify-center">
-            <span className="material-symbols-outlined text-tertiary-container text-5xl">
+            <span className="material-symbols-outlined text-tertiary-container !text-5xl">
               bar_chart
             </span>
           </div>
@@ -78,7 +78,7 @@ export default function FeaturesSection() {
         {/* Smart Location */}
         <div className="md:col-span-2 md:row-span-1 bg-secondary-container p-10 rounded-xl flex items-center gap-8 group overflow-hidden">
           <div className="flex-1">
-            <h4 className="text-3xl font-bold font-headline text-on-secondary-container mb-4">
+            <h4 className="!text-3xl font-bold font-headline text-on-secondary-container mb-4">
               Smart Location
             </h4>
             <p className="text-on-secondary-container/80 mb-6">
@@ -104,7 +104,7 @@ export default function FeaturesSection() {
 
         {/* Analytics */}
         <div className="md:col-span-1 md:row-span-1 bg-surface-container-highest p-10 rounded-xl flex flex-col justify-end">
-          <span className="material-symbols-outlined text-primary text-4xl mb-4">
+          <span className="material-symbols-outlined text-primary !text-4xl mb-4">
             insights
           </span>
           <h4 className="text-xl font-bold font-headline mb-1">Analytics</h4>

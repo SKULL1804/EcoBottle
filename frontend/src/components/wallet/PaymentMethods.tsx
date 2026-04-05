@@ -8,7 +8,6 @@ export default function PaymentMethods() {
           E-Wallet Terhubung
         </h4>
         <button className="text-primary text-xs font-bold hover:underline flex items-center gap-1">
-          <span className="material-symbols-outlined text-sm">add</span>
           Tambah
         </button>
       </div>

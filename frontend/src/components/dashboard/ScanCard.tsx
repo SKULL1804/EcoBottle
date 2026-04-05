@@ -26,7 +26,7 @@ export default function ScanCard() {
       <div className="relative z-10 mt-8">
         <button className="group flex items-center justify-between w-full p-4 bg-surface-container-lowest/10 backdrop-blur-md rounded-2xl hover:bg-surface-container-lowest/20 transition-all">
           <div className="flex items-center gap-4">
-            <div className="bg-surface-container-lowest p-3 rounded-xl text-primary">
+            <div className="bg-surface-container-lowest flex items-center justify-center p-3 rounded-xl text-primary">
               <span
                 className="material-symbols-outlined"
                 style={{ fontVariationSettings: '"FILL" 1' }}

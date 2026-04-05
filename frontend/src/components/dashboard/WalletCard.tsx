@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function WalletCard() {
   return (
     <section className="md:col-span-4 lg:col-span-3 bg-surface-container-lowest rounded-xl p-8 flex flex-col justify-between shadow-[0px_24px_48px_rgba(17,28,45,0.06)] overflow-hidden relative group">
@@ -6,7 +8,7 @@ export default function WalletCard() {
 
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-8">
-          <div className="p-3 bg-secondary-container rounded-2xl">
+          <div className="p-3 bg-secondary-container rounded-2xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-3xl">
               account_balance_wallet
             </span>
@@ -27,9 +29,9 @@ export default function WalletCard() {
         <button className="flex-1 py-4 gradient-primary text-on-primary font-bold rounded-full text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-200">
           Withdraw
         </button>
-        <button className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-full text-sm hover:bg-surface-container-highest transition-colors">
+        <Link href="/dashboard/history" className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-full text-sm hover:bg-surface-container-highest transition-colors">
           History
-        </button>
+        </Link>
       </div>
     </section>
   );

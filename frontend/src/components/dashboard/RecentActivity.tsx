@@ -1,13 +1,14 @@
 import { RECENT_TRANSACTIONS } from "@/constants/dashboard";
+import Link from "next/link";
 
 export default function RecentActivity() {
   return (
     <section className="md:col-span-4 lg:col-span-6 bg-surface-container-lowest rounded-xl p-8 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-8">
         <h4 className="text-xl font-bold font-headline">Recent Activity</h4>
-        <button className="text-primary text-sm font-bold hover:underline">
+        <Link href="/dashboard/history" className="text-primary text-sm font-bold hover:underline">
           View All
-        </button>
+        </Link>
       </div>
 
       <div className="space-y-4">
