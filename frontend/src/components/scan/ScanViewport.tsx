@@ -1,228 +1,214 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { scanApi } from "@/lib/api";
 
-/** Detected bottle result type. */
-interface DetectedBottle {
-  type: string;
-  material: string;
-  condition: string;
-  reward: string;
-  confidence: number;
-}
+type ScanState = "IDLE" | "SCANNING" | "DETECTED" | "CONFIRMING" | "CONFIRMED";
 
-const MOCK_HISTORY: DetectedBottle[] = [
-  {
-    type: "PET 600ml",
-    material: "Plastik PET",
-    condition: "Bersih",
-    reward: "Rp 500",
-    confidence: 99,
-  },
-  {
-    type: "PET 1.5L",
-    material: "Plastik PET",
-    condition: "Bersih",
-    reward: "Rp 750",
-    confidence: 97,
-  },
-];
+interface BBox { x1: number; y1: number; x2: number; y2: number; }
+interface Detection { bbox: BBox; class: string; label: string; type: string; confidence: number; }
+interface PreviewResult { detections: Detection[]; total_items: number; }
+interface AnalyzeResult { scan_id: string; detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[]; total_items: number; total_value: number; }
+interface ConfirmResult { message: string; balance_added: number; points_earned: number; new_balance: number; new_points: number; gamification?: { level: number; level_title: string; new_achievements: { title: string; icon: string; description: string }[]; level_up: boolean; }; }
 
 export default function ScanViewport() {
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<DetectedBottle | null>(null);
+  const { refreshUser } = useAuth();
+  const [state, setState] = useState<ScanState>("IDLE");
+  const [detections, setDetections] = useState<Detection[]>([]);
+  const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResult | null>(null);
+  const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
+  const [error, setError] = useState("");
+  const [statusText, setStatusText] = useState("");
 
-  const handleScan = () => {
-    setIsScanning(true);
-    setResult(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastFrameRef = useRef<Blob | null>(null);
 
-    // Simulate AI scanning
-    setTimeout(() => {
-      setIsScanning(false);
-      setResult({
-        type: "PET 600ml",
-        material: "Plastik PET",
-        condition: "Bersih",
-        reward: "Rp 500",
-        confidence: 99.2,
+  const startCamera = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
       });
-    }, 2500);
+      streamRef.current = stream;
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch { setError("Gagal mengakses kamera. Pastikan izin kamera diberikan."); }
+  }, []);
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  }, []);
+
+  useEffect(() => {
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); stopCamera(); };
+  }, [stopCamera]);
+
+  const drawBoxes = useCallback((dets: Detection[]) => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (const d of dets) {
+      const x = d.bbox.x1 * canvas.width, y = d.bbox.y1 * canvas.height;
+      const w = (d.bbox.x2 - d.bbox.x1) * canvas.width, h = (d.bbox.y2 - d.bbox.y1) * canvas.height;
+      ctx.strokeStyle = "#10b981"; ctx.lineWidth = 3; ctx.strokeRect(x, y, w, h);
+      const corner = 14; ctx.lineWidth = 4; ctx.strokeStyle = "#6ffbbe";
+      ctx.beginPath(); ctx.moveTo(x, y + corner); ctx.lineTo(x, y); ctx.lineTo(x + corner, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + w - corner, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + corner); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, y + h - corner); ctx.lineTo(x, y + h); ctx.lineTo(x + corner, y + h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + w - corner, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - corner); ctx.stroke();
+      const label = `${d.label} ${Math.round(d.confidence * 100)}%`;
+      ctx.font = "bold 13px Inter, sans-serif";
+      const metrics = ctx.measureText(label);
+      ctx.fillStyle = "rgba(16, 185, 129, 0.85)"; ctx.fillRect(x, y - 22, metrics.width + 12, 22);
+      ctx.fillStyle = "#ffffff"; ctx.fillText(label, x + 6, y - 6);
+    }
+  }, []);
+
+  const captureFrame = useCallback((): Promise<Blob | null> => {
+    return new Promise(resolve => {
+      const video = videoRef.current;
+      if (!video || !video.videoWidth) { resolve(null); return; }
+      const c = document.createElement("canvas");
+      c.width = video.videoWidth; c.height = video.videoHeight;
+      c.getContext("2d")!.drawImage(video, 0, 0);
+      c.toBlob(blob => resolve(blob), "image/jpeg", 0.8);
+    });
+  }, []);
+
+  const previewOneFrame = useCallback(async () => {
+    const blob = await captureFrame();
+    if (!blob) return;
+    lastFrameRef.current = blob;
+    setStatusText("⏳ Menganalisis...");
+    try {
+      const { status, data } = await scanApi.preview(blob);
+      if (status !== 200) return;
+      const result = data as PreviewResult;
+      setDetections(result.detections);
+      drawBoxes(result.detections);
+      if (result.total_items > 0) {
+        setState("DETECTED");
+        if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+        setStatusText(`✅ ${result.total_items} botol terdeteksi!`);
+      } else {
+        setStatusText("🔍 Mencari botol... arahkan kamera ke botol");
+      }
+    } catch { setStatusText("⚠️ Koneksi gagal, mencoba lagi..."); }
+  }, [captureFrame, drawBoxes]);
+
+  const startScanning = useCallback(async () => {
+    setError(""); setAnalyzeResult(null); setConfirmResult(null); setDetections([]);
+    setState("SCANNING"); await startCamera();
+    setStatusText("🔍 Memulai deteksi...");
+    setTimeout(() => { previewOneFrame(); intervalRef.current = setInterval(previewOneFrame, 3000); }, 1000);
+  }, [startCamera, previewOneFrame]);
+
+  const handleConfirm = async () => {
+    setState("CONFIRMING"); setStatusText("📦 Menyetorkan botol...");
+    const blob = lastFrameRef.current || await captureFrame();
+    if (!blob) { setError("Gagal menangkap frame"); setState("DETECTED"); return; }
+    try {
+      const { status: aS, data: aD } = await scanApi.analyze(blob);
+      if (aS !== 200) { setError((aD as { detail?: string }).detail || "Analisis gagal"); setState("DETECTED"); return; }
+      const aResult = aD as AnalyzeResult;
+      setAnalyzeResult(aResult);
+      const { status: cS, data: cD } = await scanApi.confirm(aResult.scan_id);
+      if (cS !== 200) { setError((cD as { detail?: string }).detail || "Konfirmasi gagal"); setState("DETECTED"); return; }
+      setConfirmResult(cD as ConfirmResult);
+      setState("CONFIRMED"); setStatusText("🎉 Berhasil disetor!");
+      await refreshUser();
+    } catch { setError("Koneksi gagal saat menyetor"); setState("DETECTED"); }
+  };
+
+  const scanAgain = () => {
+    setDetections([]); setAnalyzeResult(null); setConfirmResult(null); setError(""); stopCamera(); setState("IDLE");
+    if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  };
+
+  const stopScanning = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    stopCamera(); setDetections([]); setState("IDLE"); setStatusText("");
+    if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      {/* ─── Scanner Area (3 cols) ─── */}
       <div className="lg:col-span-3 flex flex-col gap-6">
-        {/* Scanner Viewport */}
         <div className="bg-gradient-to-br from-on-primary-container to-primary rounded-2xl p-1 shadow-xl">
-          <div className="bg-on-primary-container/90 rounded-xl overflow-hidden relative aspect-[4/3] flex items-center justify-center">
-            {/* Corner brackets */}
-            <div className="absolute top-6 left-6 w-12 h-12 border-t-3 border-l-3 border-primary-fixed rounded-tl-xl" />
-            <div className="absolute top-6 right-6 w-12 h-12 border-t-3 border-r-3 border-primary-fixed rounded-tr-xl" />
-            <div className="absolute bottom-6 left-6 w-12 h-12 border-b-3 border-l-3 border-primary-fixed rounded-bl-xl" />
-            <div className="absolute bottom-6 right-6 w-12 h-12 border-b-3 border-r-3 border-primary-fixed rounded-br-xl" />
-
-            {/* Scan line animation */}
-            {isScanning && (
-              <div className="absolute inset-x-8 h-0.5 bg-primary-fixed animate-scan-line" />
+          <div className="bg-on-primary-container/90 rounded-xl overflow-hidden relative aspect-[4/3]">
+            <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ display: state !== "IDLE" ? "block" : "none" }} />
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ display: state !== "IDLE" ? "block" : "none" }} />
+            {state === "IDLE" && (
+              <div className="absolute inset-0 flex items-center justify-center flex-col">
+                <span className="material-symbols-outlined text-primary-fixed text-7xl mb-4 opacity-60">qr_code_scanner</span>
+                <p className="text-primary-fixed/70 text-sm font-medium">Tekan tombol di bawah untuk mulai scan</p>
+              </div>
             )}
-
-            {/* Center content */}
-            <div className="text-center z-10">
-              {!isScanning && !result && (
-                <>
-                  <span className="material-symbols-outlined text-primary-fixed text-7xl mb-4 block opacity-60">
-                    qr_code_scanner
-                  </span>
-                  <p className="text-primary-fixed/70 text-sm font-medium">
-                    Arahkan kamera ke botol
-                  </p>
-                </>
-              )}
-
-              {isScanning && (
-                <>
-                  <div className="w-16 h-16 border-4 border-primary-fixed/30 border-t-primary-fixed rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-primary-fixed text-sm font-bold tracking-wide animate-pulse">
-                    Mendeteksi botol...
-                  </p>
-                </>
-              )}
-
-              {result && (
-                <div className="animate-in">
-                  <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-container/30">
-                    <span
-                      className="material-symbols-outlined text-on-primary text-3xl"
-                      style={{ fontVariationSettings: '"FILL" 1' }}
-                    >
-                      check_circle
-                    </span>
-                  </div>
-                  <p className="text-primary-fixed font-bold text-lg">
-                    Botol Terdeteksi!
-                  </p>
-                  <p className="text-primary-fixed/60 text-xs mt-1">
-                    Confidence: {result.confidence}%
-                  </p>
-                </div>
-              )}
-            </div>
+            {state !== "IDLE" && (
+              <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-black/70 backdrop-blur-sm">
+                <p className="text-primary-fixed text-sm font-semibold">{statusText}</p>
+              </div>
+            )}
+            {state === "SCANNING" && <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-0.5 bg-primary-fixed/60 animate-pulse" />}
           </div>
         </div>
 
-        {/* Scan button */}
-        <button
-          onClick={handleScan}
-          disabled={isScanning}
-          className={`w-full py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
-            isScanning
-              ? "bg-surface-container-high text-tertiary cursor-wait"
-              : "gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
-          }`}
-        >
-          <span
-            className="material-symbols-outlined text-2xl"
-            style={{ fontVariationSettings: '"FILL" 1' }}
-          >
-            {isScanning ? "hourglass_top" : "center_focus_strong"}
-          </span>
-          {isScanning ? "Sedang Memindai..." : "Mulai Scan"}
-        </button>
-      </div>
-
-      {/* ─── Right Panel (2 cols) ─── */}
-      <div className="lg:col-span-2 flex flex-col gap-6">
-        {/* Detection Result Card */}
-        {result && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-primary-container/20 rounded-xl">
-                <span className="material-symbols-outlined text-primary text-2xl">
-                  eco
-                </span>
-              </div>
-              <div>
-                <h4 className="font-bold text-on-surface font-headline">
-                  Hasil Deteksi
-                </h4>
-                <p className="text-tertiary text-xs">AI Detection Report</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
-                <span className="text-tertiary text-sm">Tipe</span>
-                <span className="font-bold text-on-surface text-sm">
-                  {result.type}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
-                <span className="text-tertiary text-sm">Material</span>
-                <span className="font-bold text-on-surface text-sm">
-                  {result.material}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
-                <span className="text-tertiary text-sm">Kondisi</span>
-                <span className="font-bold text-primary text-sm">
-                  {result.condition}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-secondary-container rounded-xl">
-                <span className="text-on-secondary-container text-sm font-medium">
-                  Reward
-                </span>
-                <span className="font-black text-primary text-xl font-headline">
-                  {result.reward}
-                </span>
-              </div>
-            </div>
-
-            <button className="w-full mt-6 py-4 gradient-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-              <span className="flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined">add_circle</span>
-                Klaim Reward
-              </span>
+        {state === "IDLE" && (
+          <button onClick={startScanning} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>center_focus_strong</span>
+            Mulai Scan
+          </button>
+        )}
+        {state === "SCANNING" && (
+          <button onClick={stopScanning} className="w-full py-5 rounded-2xl font-bold text-lg bg-error text-on-error shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-2xl">stop_circle</span> Stop Scan
+          </button>
+        )}
+        {state === "DETECTED" && (
+          <div className="flex gap-3">
+            <button onClick={handleConfirm} className="flex-1 py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
+              Setorkan {detections.length} Botol
             </button>
+            <button onClick={scanAgain} className="px-6 py-5 rounded-2xl font-bold text-lg bg-surface-container-high text-tertiary hover:scale-[1.02] active:scale-[0.98] transition-all">↻</button>
           </div>
         )}
+        {state === "CONFIRMING" && (
+          <div className="w-full py-5 rounded-2xl font-bold text-lg bg-surface-container-high text-tertiary flex items-center justify-center gap-3">
+            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> Memproses setoran...
+          </div>
+        )}
+        {state === "CONFIRMED" && (
+          <button onClick={scanAgain} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-2xl">restart_alt</span> Scan Lagi
+          </button>
+        )}
+        {error && <div className="p-4 bg-error-container text-on-error-container rounded-xl text-sm font-medium">{error}</div>}
+      </div>
 
-        {/* Instructions Card (show when no result) */}
-        {!result && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-            <h4 className="font-bold text-on-surface font-headline mb-4">
-              Cara Scan
-            </h4>
-            <div className="space-y-4">
-              {[
-                {
-                  icon: "photo_camera",
-                  title: "Arahkan Kamera",
-                  desc: "Posisikan botol di dalam area viewfinder",
-                },
-                {
-                  icon: "center_focus_strong",
-                  title: "AI Deteksi",
-                  desc: "Sistem akan mendeteksi tipe & kondisi botol",
-                },
-                {
-                  icon: "account_balance_wallet",
-                  title: "Terima Reward",
-                  desc: "Saldo otomatis masuk ke wallet Anda",
-                },
-              ].map((step, i) => (
-                <div key={step.title} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary text-xl">
-                      {step.icon}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-on-surface text-sm">
-                      {i + 1}. {step.title}
-                    </p>
-                    <p className="text-tertiary text-xs">{step.desc}</p>
+      <div className="lg:col-span-2 flex flex-col gap-6">
+        {state === "DETECTED" && detections.length > 0 && (
+          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl">eco</span></div>
+              <div><h4 className="font-bold text-on-surface font-headline">Botol Terdeteksi</h4><p className="text-tertiary text-xs">Preview — belum dikonfirmasi</p></div>
+            </div>
+            <div className="space-y-3">
+              {detections.map((d, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-surface rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center"><span className="material-symbols-outlined text-primary text-lg">recycling</span></div>
+                    <div><p className="font-bold text-on-surface text-sm">{d.label}</p><p className="text-tertiary text-[10px]">{d.type} • {Math.round(d.confidence * 100)}%</p></div>
                   </div>
                 </div>
               ))}
@@ -230,69 +216,64 @@ export default function ScanViewport() {
           </div>
         )}
 
-        {/* Scan Stats */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="font-bold text-on-surface font-headline">
-              Statistik Hari Ini
-            </h4>
-            <span className="text-primary text-xs font-bold bg-primary/10 px-2.5 py-1 rounded-full">
-              Live
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-primary font-headline">
-                3
-              </p>
-              <p className="text-tertiary text-xs font-medium mt-1">
-                Botol Scan
-              </p>
+        {state === "CONFIRMED" && confirmResult && (
+          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span></div>
+              <div><h4 className="font-bold text-on-surface font-headline">Berhasil Disetor!</h4><p className="text-tertiary text-xs">{analyzeResult?.total_items ?? 0} botol dikonfirmasi</p></div>
             </div>
-            <div className="bg-surface rounded-xl p-4 text-center">
-              <p className="text-3xl font-black text-primary font-headline">
-                Rp 1.750
-              </p>
-              <p className="text-tertiary text-xs font-medium mt-1">
-                Total Reward
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Scans */}
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-          <h4 className="font-bold text-on-surface font-headline mb-4">
-            Riwayat Scan
-          </h4>
-          <div className="space-y-3">
-            {MOCK_HISTORY.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 bg-surface rounded-xl"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-lg">
-                      recycling
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-on-surface text-sm">
-                      {item.type}
-                    </p>
-                    <p className="text-tertiary text-[10px]">
-                      {item.condition} • {item.confidence}%
-                    </p>
-                  </div>
-                </div>
-                <span className="font-bold text-primary text-sm">
-                  +{item.reward}
-                </span>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-4 bg-secondary-container rounded-xl">
+                <span className="text-on-secondary-container text-sm font-medium">Saldo Ditambahkan</span>
+                <span className="font-black text-primary text-xl font-headline">+Rp{(confirmResult.balance_added ?? 0).toLocaleString("id")}</span>
               </div>
-            ))}
+              <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
+                <span className="text-tertiary text-sm">Poin</span>
+                <span className="font-bold text-primary text-sm">+{confirmResult.points_earned ?? 0} poin</span>
+              </div>
+            </div>
+            {confirmResult.gamification && (
+              <div className="mt-4 space-y-3">
+                <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
+                  <span className="text-tertiary text-sm">Level</span>
+                  <span className="font-bold text-on-surface text-sm">{confirmResult.gamification.level_title}</span>
+                </div>
+                {confirmResult.gamification.level_up && (
+                  <div className="p-4 bg-primary/10 rounded-xl text-center animate-bounce">
+                    <p className="text-primary font-bold text-lg">🎉 Level Up!</p>
+                    <p className="text-primary/70 text-xs">{confirmResult.gamification.level_title}</p>
+                  </div>
+                )}
+                {confirmResult.gamification.new_achievements?.map((ach, i) => (
+                  <div key={i} className="p-3 bg-primary/10 rounded-xl flex items-center gap-3">
+                    <span className="text-2xl">{ach.icon}</span>
+                    <div><p className="font-bold text-primary text-sm">{ach.title}</p><p className="text-primary/70 text-xs">{ach.description}</p></div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {state === "IDLE" && (
+          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+            <h4 className="font-bold text-on-surface font-headline mb-4">Cara Scan</h4>
+            <div className="space-y-4">
+              {[
+                { icon: "center_focus_strong", title: "Mulai Scan", desc: "Tekan tombol untuk aktifkan kamera" },
+                { icon: "search", title: "AI Deteksi Real-Time", desc: "Kotak hijau muncul di sekeliling botol yang terdeteksi" },
+                { icon: "check_circle", title: "Konfirmasi", desc: "Tekan \"Setorkan\" untuk menyetor botol dan dapatkan saldo" },
+              ].map((step, i) => (
+                <div key={step.title} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-primary text-xl">{step.icon}</span>
+                  </div>
+                  <div><p className="font-bold text-on-surface text-sm">{i + 1}. {step.title}</p><p className="text-tertiary text-xs">{step.desc}</p></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

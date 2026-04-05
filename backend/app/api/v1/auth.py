@@ -85,6 +85,28 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+from pydantic import BaseModel
+from typing import Optional
+
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
+    body: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update nama dan/atau nomor telepon user."""
+    if body.name is not None:
+        current_user.name = body.name
+    if body.phone is not None:
+        current_user.phone = body.phone
+    await db.flush()
+    return current_user
+
+
 # ─── Google OAuth ─────────────────────────────────────────
 
 @router.post("/google", response_model=TokenResponse)

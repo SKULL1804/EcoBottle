@@ -1,64 +1,51 @@
-import { PAYMENT_METHODS } from "@/constants/wallet";
+"use client";
+
+import { useState, useEffect } from "react";
+import { txApi } from "@/lib/api";
+
+interface Channel { code: string; name: string; channel_category: string; }
 
 export default function PaymentMethods() {
+  const [channels, setChannels] = useState<Channel[]>([]);
+
+  useEffect(() => {
+    txApi.channels().then(({ status, data }) => {
+      if (status === 200) setChannels(data as Channel[]);
+    }).catch(() => { });
+  }, []);
+
+  const iconMap: Record<string, string> = {
+    ID_OVO: "payments", ID_GOPAY: "account_balance", ID_DANA: "credit_card",
+    ID_SHOPEEPAY: "shopping_bag", ID_LINKAJA: "link", PH_GCASH: "phone_android",
+  };
+
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
-        <h4 className="font-bold text-on-surface font-headline">
-          E-Wallet Terhubung
-        </h4>
-        <button className="text-primary text-xs font-bold hover:underline flex items-center gap-1">
-          Tambah
-        </button>
+        <h4 className="font-bold text-on-surface font-headline">Metode Pencairan</h4>
+        <span className="text-tertiary text-xs font-medium">{channels.length} tersedia</span>
       </div>
 
-      <div className="space-y-3">
-        {PAYMENT_METHODS.map((pm) => (
-          <div
-            key={pm.name}
-            className={`flex items-center justify-between p-4 rounded-xl transition-colors ${
-              pm.connected
-                ? "bg-surface border border-transparent hover:border-primary/10"
-                : "bg-surface-container border border-dashed border-outline-variant/30"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                  pm.connected
-                    ? "bg-secondary-container text-primary"
-                    : "bg-surface-container-high text-outline"
-                }`}
-              >
-                <span className="material-symbols-outlined text-xl">
-                  {pm.icon}
-                </span>
+      {channels.length === 0 ? (
+        <p className="text-tertiary text-sm text-center py-6">Memuat...</p>
+      ) : (
+        <div className="space-y-3">
+          {channels.map((ch) => (
+            <div key={ch.code} className="flex items-center justify-between p-4 bg-surface rounded-xl border border-transparent hover:border-primary/10 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="w-11 h-11 rounded-xl bg-secondary-container text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-xl">{iconMap[ch.code] || "account_balance_wallet"}</span>
+                </div>
+                <div>
+                  <p className="font-bold text-on-surface text-sm">{ch.name}</p>
+                  <p className="text-[11px] text-tertiary capitalize">{ch.channel_category?.replace("_", " ") || "e-wallet"}</p>
+                </div>
               </div>
-              <div>
-                <p
-                  className={`font-bold text-sm ${
-                    pm.connected ? "text-on-surface" : "text-tertiary"
-                  }`}
-                >
-                  {pm.name}
-                </p>
-                <p className="text-[11px] text-tertiary">
-                  {pm.connected ? pm.phone : "Belum terhubung"}
-                </p>
-              </div>
+              <span className="bg-primary/10 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">Tersedia</span>
             </div>
-            {pm.connected ? (
-              <span className="bg-primary/10 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full">
-                Connected
-              </span>
-            ) : (
-              <button className="text-primary text-xs font-bold bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/15 transition-colors">
-                Hubungkan
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
