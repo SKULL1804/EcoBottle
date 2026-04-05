@@ -27,6 +27,8 @@ class Transaction(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     points_earned: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending, completed, failed
+    channel_code: Mapped[str | None] = mapped_column(String(30), nullable=True)  # e.g. BCA, ID_OVO
+    xendit_payout_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()
     )

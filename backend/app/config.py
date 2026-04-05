@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = ""  # Verified sender email in Brevo
 
+    # Xendit (Payout / Disbursement)
+    XENDIT_SECRET_KEY: str = ""
+
     # File Upload
     UPLOAD_DIR: str = "./uploads"
 

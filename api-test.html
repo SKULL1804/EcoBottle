@@ -1023,12 +1023,49 @@
                 <!-- ═══ WITHDRAW ═══ -->
                 <div class="endpoint-card" id="card-withdraw">
                     <div class="card-header"><span class="method post">POST</span>
-                        <h2>Pencairan Saldo</h2><span class="path">/api/v1/transactions/withdraw</span>
+                        <h2>💸 Pencairan Saldo via Xendit</h2><span class="path">/api/v1/transactions/withdraw</span>
                     </div>
                     <div class="card-body">
-                        <div class="form-group"><label>Jumlah Pencairan (Rp)</label><input type="number"
-                                id="withdraw-amount" placeholder="5000" min="1000" /></div>
-                        <div class="actions"><button class="btn btn-primary" onclick="doWithdraw()">💸 Cairkan</button>
+                        <div class="form-group">
+                            <label>Channel (Bank / E-Wallet)</label>
+                            <select id="withdraw-channel"
+                                style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;">
+                                <optgroup label="🏦 Bank">
+                                    <option value="BCA">Bank BCA</option>
+                                    <option value="BNI">Bank BNI</option>
+                                    <option value="BRI">Bank BRI</option>
+                                    <option value="MANDIRI">Bank Mandiri</option>
+                                    <option value="BSI">Bank Syariah Indonesia</option>
+                                    <option value="PERMATA">Bank Permata</option>
+                                    <option value="CIMB">Bank CIMB Niaga</option>
+                                    <option value="DANAMON">Bank Danamon</option>
+                                </optgroup>
+                                <optgroup label="📱 E-Wallet">
+                                    <option value="ID_OVO">OVO</option>
+                                    <option value="ID_DANA">DANA</option>
+                                    <option value="ID_GOPAY">GoPay</option>
+                                    <option value="ID_SHOPEEPAY">ShopeePay</option>
+                                    <option value="ID_LINKAJA">LinkAja</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nomor Rekening / HP</label>
+                                <input type="text" id="withdraw-account" placeholder="1234567890" />
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Pemilik Rekening</label>
+                                <input type="text" id="withdraw-name" placeholder="Budi Santoso" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Pencairan (Rp)</label>
+                            <input type="number" id="withdraw-amount" placeholder="5000" min="150" />
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary" id="withdrawBtn" onclick="doWithdraw()">💸 Cairkan via
+                                Xendit</button>
                         </div>
                         <div class="response-area" id="resp-withdraw" style="display:none"></div>
                     </div>
@@ -1411,11 +1448,23 @@
 
         async function doWithdraw() {
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
-            if (!amount || amount < 1000) { toast('Minimal pencairan Rp1.000', 'error'); return; }
-            const { status, data } = await api('POST', '/api/v1/transactions/withdraw', { amount });
-            showResponse('withdraw', status, data);
-            if (status === 200) { toast(`💸 ${data.message}`); if (currentUser) { currentUser.balance = data.new_balance; updateAuthUI(); } }
-            else toast(data.detail || 'Pencairan gagal', 'error');
+            const channel_code = document.getElementById('withdraw-channel').value;
+            const account_number = document.getElementById('withdraw-account').value;
+            const account_holder_name = document.getElementById('withdraw-name').value;
+            if (!amount || amount < 150) { toast('Minimal pencairan Rp150', 'error'); return; }
+            if (!account_number) { toast('Masukkan nomor rekening/HP', 'error'); return; }
+            if (!account_holder_name) { toast('Masukkan nama pemilik rekening', 'error'); return; }
+            const btn = document.getElementById('withdrawBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Memproses...';
+            try {
+                const { status, data } = await api('POST', '/api/v1/transactions/withdraw', { amount, channel_code, account_number, account_holder_name });
+                showResponse('withdraw', status, data);
+                if (status === 200) {
+                    toast(`💸 ${data.message}`);
+                    if (currentUser) { currentUser.balance = data.new_balance; updateAuthUI(); }
+                } else toast(data.detail || 'Pencairan gagal', 'error');
+            } catch (e) { toast('❌ Gagal memproses pencairan', 'error'); }
+            btn.disabled = false; btn.innerHTML = '💸 Cairkan via Xendit';
         }
 
         async function getBottles() {
