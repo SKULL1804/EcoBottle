@@ -18,8 +18,32 @@ from app.schemas.scanner import (
     ScanHistoryResponse,
 )
 from app.services.scanner_service import process_scan, confirm_scan
+from app.utils.vision_client import analyze_bottle_preview
 
 router = APIRouter(prefix="/scan", tags=["Scanner ⭐"])
+
+PREVIEW_ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
+PREVIEW_MAX_SIZE = 5 * 1024 * 1024  # 5MB for preview (lighter)
+
+
+@router.post("/preview")
+async def preview_scan(
+    file: UploadFile = File(..., description="Frame kamera untuk preview (tanpa simpan)"),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Real-time preview — mendeteksi botol dan return bounding box coordinates.
+    TIDAK menyimpan gambar ke disk, TIDAK membuat scan_log.
+    Digunakan untuk overlay bounding box di kamera frontend.
+    """
+    from fastapi import HTTPException, status as http_status
+    if file.content_type not in PREVIEW_ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="Format tidak didukung")
+    image_data = await file.read()
+    if len(image_data) > PREVIEW_MAX_SIZE:
+        raise HTTPException(status_code=400, detail="File terlalu besar untuk preview")
+    result = await analyze_bottle_preview(image_data)
+    return result
 
 
 @router.post("/analyze", response_model=ScanResponse)

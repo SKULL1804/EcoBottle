@@ -84,7 +84,7 @@ async def analyze_bottle_image(image_data: bytes, mime_type: str = "image/jpeg")
     model = _load_model()
 
     # Run inference (batch=1, optimized for low RAM)
-    results = model(image, conf=0.25, imgsz=640, verbose=False)
+    results = model(image, conf=0.55, imgsz=640, verbose=False)
 
     # Parse detections
     bottles = []
@@ -136,4 +136,64 @@ async def analyze_bottle_image(image_data: bytes, mime_type: str = "image/jpeg")
         "bottles": bottles,
         "total_items": total_items,
         "image_quality": image_quality,
+    }
+
+
+async def analyze_bottle_preview(image_data: bytes) -> dict:
+    """
+    Lightweight preview analysis for real-time camera detection.
+    Returns individual bounding boxes with coordinates for frontend overlay.
+    Does NOT group by class — each detected object gets its own bbox.
+
+    Returns:
+        Dict with list of bounding boxes and summary
+    """
+    image = Image.open(io.BytesIO(image_data))
+    img_w, img_h = image.size
+
+    model = _load_model()
+    results = model(image, conf=0.65, imgsz=640, verbose=False)
+
+    # Minimum bbox area threshold (relative) to reject tiny/noise detections
+    MIN_BBOX_AREA = 0.005  # at least 0.5% of image area
+
+    detections = []
+    for result in results:
+        for box in result.boxes:
+            cls_id = int(box.cls[0])
+            cls_name = result.names[cls_id]
+            confidence = float(box.conf[0])
+
+            if cls_name not in RECYCLABLE_CLASSES:
+                continue
+
+            # Get normalized bbox coordinates (0-1 range for frontend canvas)
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            nx1, ny1 = x1 / img_w, y1 / img_h
+            nx2, ny2 = x2 / img_w, y2 / img_h
+
+            # Reject tiny detections (noise / false positives)
+            bbox_area = (nx2 - nx1) * (ny2 - ny1)
+            if bbox_area < MIN_BBOX_AREA:
+                continue
+
+            detections.append({
+                "bbox": {
+                    "x1": round(nx1, 4),
+                    "y1": round(ny1, 4),
+                    "x2": round(nx2, 4),
+                    "y2": round(ny2, 4),
+                },
+                "class": cls_name,
+                "label": CLASS_TO_BRAND.get(cls_name, cls_name),
+                "type": CLASS_TO_BOTTLE_TYPE.get(cls_name, "PET_bottle"),
+                "confidence": round(confidence, 2),
+            })
+
+    del results
+    gc.collect()
+
+    return {
+        "detections": detections,
+        "total_items": len(detections),
     }

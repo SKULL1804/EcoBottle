@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # Xendit (Payout / Disbursement)
     XENDIT_SECRET_KEY: str = ""
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
     # File Upload
     UPLOAD_DIR: str = "./uploads"
 

@@ -18,6 +18,7 @@ from app.models.transaction import Transaction
 from app.schemas.scanner import DetectedBottle, ScanResponse, ScanConfirmResponse
 from app.utils.vision_client import analyze_bottle_image
 from app.services.pricing_service import get_price_for_bottle, calculate_points
+from app.services.gamification_service import process_gamification
 
 settings = get_settings()
 
@@ -134,7 +135,7 @@ async def confirm_scan(
 ) -> ScanConfirmResponse:
     """
     Confirm a pending scan — credits balance and points to user.
-    Creates a 'deposit' transaction.
+    Creates a 'deposit' transaction and processes gamification.
     """
     # Find scan log
     result = await db.execute(
@@ -158,6 +159,11 @@ async def confirm_scan(
     amount = scan_log.total_value or Decimal("0")
     points = calculate_points(amount)
 
+    # Count bottles in this scan
+    detected = scan_log.detected_bottles or {}
+    bottles_list = detected.get("bottles", [])
+    total_bottles = sum(b.get("quantity", 1) for b in bottles_list)
+
     # Update scan status
     scan_log.status = "confirmed"
 
@@ -175,6 +181,10 @@ async def confirm_scan(
         status="completed",
     )
     db.add(transaction)
+
+    # Process gamification (level up, achievements)
+    gamification = await process_gamification(db, user, total_bottles)
+
     await db.flush()
 
     return ScanConfirmResponse(
@@ -185,4 +195,5 @@ async def confirm_scan(
         new_balance=user.balance,
         new_points=user.points,
         message=f"Setoran dikonfirmasi! Rp{amount:,.0f} dan {points} poin ditambahkan.",
+        gamification=gamification,
     )

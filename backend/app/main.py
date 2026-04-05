@@ -75,6 +75,10 @@ from app.api.v1.users import router as users_router
 from app.api.v1.scanner import router as scanner_router
 from app.api.v1.transactions import router as transactions_router
 from app.api.v1.bottles import router as bottles_router
+from app.api.v1.stats import router as stats_router
+
+# Ensure all models are imported for table creation
+from app.models.achievement import Achievement  # noqa: F401
 
 API_V1_PREFIX = "/api/v1"
 
@@ -83,6 +87,7 @@ app.include_router(users_router, prefix=API_V1_PREFIX)
 app.include_router(scanner_router, prefix=API_V1_PREFIX)
 app.include_router(transactions_router, prefix=API_V1_PREFIX)
 app.include_router(bottles_router, prefix=API_V1_PREFIX)
+app.include_router(stats_router, prefix=API_V1_PREFIX)
 
 
 # ─── Health Check ──────────────────────────────────────────

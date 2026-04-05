@@ -39,6 +39,7 @@ class ScanConfirmResponse(BaseModel):
     new_balance: Decimal
     new_points: int
     message: str
+    gamification: dict | None = None
 
 
 class ScanHistoryItem(BaseModel):

@@ -61,6 +61,11 @@ class ResetPasswordRequest(BaseModel):
     new_password: str = Field(..., min_length=6, max_length=128, examples=["newpassword123"])
 
 
+class GoogleAuthRequest(BaseModel):
+    """Login/Register via Google ID token."""
+    id_token: str = Field(..., description="Google ID token dari frontend")
+
+
 # ─── User Schemas ─────────────────────────────────────────
 
 class UserResponse(BaseModel):
@@ -68,9 +73,14 @@ class UserResponse(BaseModel):
     name: str
     email: str
     phone: str | None = None
+    auth_provider: str = "local"
+    avatar_url: str | None = None
     is_verified: bool = False
     points: int = 0
     balance: Decimal = Decimal("0.00")
+    total_scans: int = 0
+    level: int = 1
+    level_title: str = "🌱 Pemula"
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -86,3 +96,39 @@ class UserBalanceResponse(BaseModel):
     points: int
 
     model_config = {"from_attributes": True}
+
+
+# ─── Stats & Gamification Schemas ─────────────────────────
+
+class AchievementResponse(BaseModel):
+    type: str
+    title: str
+    icon: str
+    description: str
+    earned_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class UserStatsResponse(BaseModel):
+    total_scans: int
+    level: int
+    level_title: str
+    points: int
+    balance: Decimal
+    achievements_count: int
+    next_level: dict | None = None
+
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    name: str
+    level: int
+    level_title: str
+    total_scans: int
+    points: int
+
+
+class LeaderboardResponse(BaseModel):
+    leaderboard: list[LeaderboardEntry]
+    user_rank: int | None = None

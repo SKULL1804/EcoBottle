@@ -91,7 +91,12 @@ async def login_user(db: AsyncSession, login_data: UserLogin) -> tuple[User, Tok
     result = await db.execute(select(User).where(User.email == login_data.email))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(login_data.password, user.password):
+    if not user or (user.password is None) or not verify_password(login_data.password, user.password):
+        if user and user.auth_provider == "google" and user.password is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Akun ini terdaftar via Google. Gunakan login Google.",
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email atau password salah",

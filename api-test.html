@@ -7,6 +7,7 @@
     <title>🌿 EcoBottle — API Tester</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --bg: #0a0f0d;
@@ -647,6 +648,123 @@
             box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
         }
 
+        /* Camera */
+        .camera-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .camera-container video {
+            width: 100%;
+            display: block;
+            border-radius: var(--radius);
+        }
+
+        .camera-container canvas {
+            display: none;
+        }
+
+        .camera-toggle {
+            display: flex;
+            gap: 2px;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 16px;
+        }
+
+        .camera-toggle button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .camera-toggle button.active {
+            background: var(--green-dark);
+            color: var(--green);
+        }
+
+        /* Stats */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .stat-card .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .achievement-item .ach-icon {
+            font-size: 28px;
+        }
+
+        .achievement-item .ach-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .achievement-item .ach-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--teal));
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -671,6 +789,10 @@
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
@@ -713,6 +835,9 @@
                     <div class="nav-item" data-target="forgot" onclick="switchTab(this)">
                         <span class="method post">POST</span> Forgot Password
                     </div>
+                    <div class="nav-item" data-target="google-login" onclick="switchTab(this)">
+                        <span class="method post">POST</span> 🌎 Google Login
+                    </div>
                 </div>
                 <div class="nav-group">
                     <div class="nav-label">👤 User</div>
@@ -742,6 +867,15 @@
                     </div>
                     <div class="nav-item" data-target="withdraw" onclick="switchTab(this)">
                         <span class="method post">POST</span> Pencairan
+                    </div>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-label">🎮 Gamifikasi</div>
+                    <div class="nav-item" data-target="stats" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Stats & Level
+                    </div>
+                    <div class="nav-item" data-target="leaderboard" onclick="switchTab(this)">
+                        <span class="method get">GET</span> Leaderboard
                     </div>
                 </div>
                 <div class="nav-group">
@@ -867,6 +1001,25 @@
                 </div>
 
                 <!-- ═══ FORGOT PASSWORD ═══ -->
+
+                <!-- ═══ GOOGLE LOGIN ═══ -->
+                <div class="endpoint-card" id="card-google-login">
+                    <div class="card-header"><span class="method post">POST</span>
+                        <h2>🌎 Login dengan Google</h2><span class="path">/api/v1/auth/google</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="g_id_onload"
+                            data-client_id="440034293613-9rvs911r7b3plkq4bgncjc2tal5pcnf0.apps.googleusercontent.com"
+                            data-callback="handleGoogleCallback" data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black"
+                            data-text="sign_in_with" data-shape="rectangular" data-width="360">
+                        </div>
+                        <p style="margin-top:12px;font-size:11px;color:var(--text-muted)">Pastikan GOOGLE_CLIENT_ID
+                            sudah diisi di .env dan di data-client_id di HTML ini.</p>
+                        <div class="response-area" id="resp-google" style="display:none"></div>
+                    </div>
+                </div>
                 <div class="endpoint-card" id="card-forgot">
                     <div class="card-header">
                         <span class="method post">POST</span>
@@ -967,16 +1120,42 @@
                         <h2>⭐ AI Scan Botol</h2><span class="path">/api/v1/scan/analyze</span>
                     </div>
                     <div class="card-body">
-                        <div class="file-drop" id="fileDrop" onclick="document.getElementById('scanFile').click()">
-                            <div class="icon">📸</div>
-                            <div class="text">Klik atau drag foto botol ke sini</div>
-                            <div class="hint">JPG, PNG, atau WebP — Maks 10MB</div>
-                            <input type="file" id="scanFile" accept="image/jpeg,image/png,image/webp"
-                                onchange="handleFileSelect(event)" />
-                            <img id="imagePreview" class="preview" style="display:none" />
+                        <div class="camera-toggle">
+                            <button class="active" id="toggleUpload" onclick="setScanMode('upload')">📁 Upload
+                                Foto</button>
+                            <button id="toggleCamera" onclick="setScanMode('camera')">🎥 Kamera Live</button>
                         </div>
-                        <div class="actions"><button class="btn btn-primary" id="scanBtn" onclick="doScan()" disabled>🤖
-                                Analisis dengan AI</button></div>
+                        <!-- Upload Mode -->
+                        <div id="scan-upload-mode">
+                            <div class="file-drop" id="fileDrop" onclick="document.getElementById('scanFile').click()">
+                                <div class="icon">📸</div>
+                                <div class="text">Klik atau drag foto botol ke sini</div>
+                                <div class="hint">JPG, PNG, atau WebP — Maks 10MB</div>
+                                <input type="file" id="scanFile" accept="image/jpeg,image/png,image/webp"
+                                    onchange="handleFileSelect(event)" />
+                                <img id="imagePreview" class="preview" style="display:none" />
+                            </div>
+                            <div class="actions"><button class="btn btn-primary" id="scanBtn" onclick="doScan()"
+                                    disabled>🤖 Analisis dengan AI</button></div>
+                        </div>
+                        <!-- Camera Mode (Real-Time) -->
+                        <div id="scan-camera-mode" style="display:none">
+                            <div class="camera-container" style="position:relative">
+                                <video id="cameraVideo" autoplay playsinline></video>
+                                <canvas id="cameraCanvas"></canvas>
+                                <div id="cameraOverlay"
+                                    style="position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:rgba(0,0,0,0.7);color:#34d399;font-size:12px;font-weight:600;display:none">
+                                    <span id="cameraStatus">🔍 Mendeteksi...</span>
+                                </div>
+                            </div>
+                            <div id="liveDetectionResults" style="margin-top:12px"></div>
+                            <div class="actions" style="margin-top:12px">
+                                <button class="btn btn-primary" id="startScanBtn" onclick="startLiveScanning()">▶️ Mulai
+                                    Deteksi</button>
+                                <button class="btn btn-danger" id="stopScanBtn" onclick="stopLiveScanning()"
+                                    style="display:none">⏹ Stop Deteksi</button>
+                            </div>
+                        </div>
                         <div id="scanResultsUI"></div>
                         <div class="response-area" id="resp-scan" style="display:none"></div>
                     </div>
@@ -1068,6 +1247,33 @@
                                 Xendit</button>
                         </div>
                         <div class="response-area" id="resp-withdraw" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ STATS ═══ -->
+                <div class="endpoint-card" id="card-stats">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>🎮 Stats & Gamifikasi</h2><span class="path">/api/v1/stats/me</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getStats()">📊 Load Stats</button>
+                        </div>
+                        <div id="statsUI"></div>
+                        <div id="achievementsUI"></div>
+                        <div class="response-area" id="resp-stats" style="display:none"></div>
+                    </div>
+                </div>
+
+                <!-- ═══ LEADERBOARD ═══ -->
+                <div class="endpoint-card" id="card-leaderboard">
+                    <div class="card-header"><span class="method get">GET</span>
+                        <h2>🏆 Leaderboard</h2><span class="path">/api/v1/stats/leaderboard</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions"><button class="btn btn-primary" onclick="getLeaderboard()">🏆 Load
+                                Leaderboard</button></div>
+                        <div id="leaderboardUI"></div>
+                        <div class="response-area" id="resp-leaderboard" style="display:none"></div>
                     </div>
                 </div>
 
@@ -1484,6 +1690,171 @@
             const { status, data } = await api('POST', '/api/v1/bottles', body);
             showResponse('seed', status, data);
             if (status === 201) toast('✅ Botol ditambahkan'); else toast(data.detail || 'Gagal', 'error');
+        }
+
+        // ─── Real-Time Camera Functions ─────────────────────────
+        let cameraStream = null;
+        let scanInterval = null;
+        let isScanning = false;
+
+        function setScanMode(mode) {
+            document.getElementById('toggleUpload').classList.toggle('active', mode === 'upload');
+            document.getElementById('toggleCamera').classList.toggle('active', mode === 'camera');
+            document.getElementById('scan-upload-mode').style.display = mode === 'upload' ? 'block' : 'none';
+            document.getElementById('scan-camera-mode').style.display = mode === 'camera' ? 'block' : 'none';
+            if (mode === 'camera') startCamera();
+            else { stopLiveScanning(); stopCamera(); }
+        }
+
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                document.getElementById('cameraVideo').srcObject = cameraStream;
+                toast('📹 Kamera aktif — tekan "Mulai Deteksi" untuk scan otomatis', 'info');
+            } catch (e) {
+                toast('❌ Gagal mengakses kamera: ' + e.message, 'error');
+                setScanMode('upload');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            const video = document.getElementById('cameraVideo');
+            if (video) video.srcObject = null;
+            document.getElementById('cameraOverlay').style.display = 'none';
+        }
+
+        function startLiveScanning() {
+            if (!cameraStream) { toast('Kamera belum aktif', 'error'); return; }
+            isScanning = true;
+            document.getElementById('startScanBtn').style.display = 'none';
+            document.getElementById('stopScanBtn').style.display = 'inline-flex';
+            document.getElementById('cameraOverlay').style.display = 'block';
+            document.getElementById('cameraStatus').textContent = '🔍 Mendeteksi botol...';
+            toast('🤖 Real-time detection aktif', 'info');
+            // Start auto-scanning every 3 seconds
+            scanOneFrame();
+            scanInterval = setInterval(scanOneFrame, 3500);
+        }
+
+        function stopLiveScanning() {
+            isScanning = false;
+            if (scanInterval) { clearInterval(scanInterval); scanInterval = null; }
+            document.getElementById('startScanBtn').style.display = 'inline-flex';
+            document.getElementById('stopScanBtn').style.display = 'none';
+            document.getElementById('cameraOverlay').style.display = 'none';
+        }
+
+        async function scanOneFrame() {
+            if (!isScanning || !cameraStream) return;
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const statusEl = document.getElementById('cameraStatus');
+            if (!video.videoWidth) return; // video not ready
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            statusEl.textContent = '⏳ Menganalisis frame...';
+
+            canvas.toBlob(async (blob) => {
+                if (!isScanning) return;
+                const formData = new FormData();
+                formData.append('file', blob, 'capture.jpg');
+                try {
+                    const res = await fetch(`${document.getElementById('baseUrl').value}/api/v1/scan/analyze`, {
+                        method: 'POST', headers: { Authorization: `Bearer ${accessToken}` }, body: formData
+                    });
+                    const data = await res.json();
+                    if (!isScanning) return;
+                    if (res.ok && data.total_items > 0) {
+                        statusEl.textContent = `✅ ${data.total_items} botol terdeteksi — Rp${Number(data.total_value).toLocaleString('id')}`;
+                        document.getElementById('confirm-scan-id').value = data.scan_id;
+                        renderLiveResults(data);
+                        showResponse('scan', res.status, data);
+                    } else if (res.ok) {
+                        statusEl.textContent = '🔍 Belum ada botol terdeteksi... arahkan kamera ke botol';
+                        document.getElementById('liveDetectionResults').innerHTML = '';
+                    } else {
+                        statusEl.textContent = '⚠️ ' + (data.detail || 'Error');
+                    }
+                } catch (e) {
+                    if (isScanning) statusEl.textContent = '❌ Koneksi gagal';
+                }
+            }, 'image/jpeg', 0.85);
+        }
+
+        function renderLiveResults(data) {
+            if (!data.detected || !data.detected.length) { document.getElementById('liveDetectionResults').innerHTML = ''; return; }
+            let html = '';
+            for (const b of data.detected) html += `<div class="scan-result-item"><div class="bottle-info"><div class="bottle-name">${b.brand}</div><div class="bottle-meta">${b.type} · ${b.volume_estimate}ml · x${b.quantity}</div></div><div class="bottle-price">Rp${Number(b.subtotal).toLocaleString('id')}</div></div>`;
+            html += `<div class="scan-result-item" style="background:var(--green-dark);border-color:var(--green)"><div class="bottle-info"><div class="bottle-name" style="color:var(--green)">Total Nilai</div></div><div class="bottle-price" style="color:var(--green);font-weight:800">Rp${Number(data.total_value).toLocaleString('id')}</div></div>`;
+            document.getElementById('liveDetectionResults').innerHTML = html;
+            // Also update the main scanResultsUI for the confirm flow
+            document.getElementById('scanResultsUI').innerHTML = html;
+        }
+
+        // ─── Stats & Gamification ──────────────────────────────
+        async function getStats() {
+            const { status, data } = await api('GET', '/api/v1/stats/me');
+            showResponse('stats', status, data);
+            if (status !== 200) { toast(data.detail || 'Gagal', 'error'); return; }
+            let html = '<div class="stat-grid">';
+            html += `<div class="stat-card"><div class="stat-value">${data.total_scans}</div><div class="stat-label">Total Scan</div></div>`;
+            html += `<div class="stat-card"><div class="stat-value">${data.level_title}</div><div class="stat-label">Level ${data.level}</div></div>`;
+            html += `<div class="stat-card"><div class="stat-value">${data.achievements_count}</div><div class="stat-label">Achievement</div></div>`;
+            html += '</div>';
+            if (data.next_level) {
+                const total = data.next_level.scans_needed;
+                const current = total - data.next_level.scans_remaining;
+                const pct = Math.min(100, Math.round((current / total) * 100));
+                html += `<div style="margin-bottom:16px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px"><div style="font-size:12px;color:var(--text-muted)">Menuju ${data.next_level.title} — ${data.next_level.scans_remaining} scan lagi</div><div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div></div>`;
+            }
+            document.getElementById('statsUI').innerHTML = html;
+            toast(`🎮 Level ${data.level}: ${data.level_title}`, 'info');
+            // Load achievements
+            const ach = await api('GET', '/api/v1/stats/achievements');
+            if (ach.status === 200 && Array.isArray(ach.data) && ach.data.length) {
+                let achHtml = '<h3 style="font-size:14px;margin:16px 0 8px;color:var(--text-dim)">🏅 Achievement</h3>';
+                for (const a of ach.data) achHtml += `<div class="achievement-item"><div class="ach-icon">${a.icon}</div><div><div class="ach-title">${a.title}</div><div class="ach-desc">${a.description}</div></div></div>`;
+                document.getElementById('achievementsUI').innerHTML = achHtml;
+            } else {
+                document.getElementById('achievementsUI').innerHTML = '<p style="color:var(--text-muted);font-size:12px;margin-top:12px">Belum ada achievement. Mulai scan botol! 🌱</p>';
+            }
+        }
+
+        async function getLeaderboard() {
+            const { status, data } = await api('GET', '/api/v1/stats/leaderboard');
+            showResponse('leaderboard', status, data);
+            if (status !== 200) { toast(data.detail || 'Gagal', 'error'); return; }
+            let html = '<div style="margin-top:16px">';
+            if (data.user_rank) html += `<div style="padding:10px 14px;background:var(--green-dark);border:1px solid var(--green);border-radius:8px;margin-bottom:12px;font-size:13px;color:var(--green)">🏅 Peringkatmu: <strong>#${data.user_rank}</strong></div>`;
+            for (const e of data.leaderboard) {
+                const medal = e.rank === 1 ? '🥇' : e.rank === 2 ? '🥈' : e.rank === 3 ? '🥉' : `#${e.rank}`;
+                html += `<div class="scan-result-item"><div class="bottle-info"><div class="bottle-name">${medal} ${e.name}</div><div class="bottle-meta">${e.level_title} · ${e.total_scans} scan · ${e.points} poin</div></div></div>`;
+            }
+            html += '</div>';
+            document.getElementById('leaderboardUI').innerHTML = html;
+            toast(`🏆 Leaderboard loaded — ${data.leaderboard.length} users`, 'info');
+        }
+
+        // ─── Google OAuth ──────────────────────────────────────
+        async function handleGoogleCallback(response) {
+            toast('🌎 Sedang memverifikasi akun Google...', 'info');
+            try {
+                const { status, data } = await api('POST', '/api/v1/auth/google', { id_token: response.credential });
+                showResponse('google', status, data);
+                if (status === 200 && data.access_token) {
+                    accessToken = data.access_token;
+                    localStorage.setItem('eco_token', accessToken);
+                    toast('✅ Login dengan Google berhasil!');
+                    await getMe(true);
+                } else toast(data.detail || 'Login Google gagal', 'error');
+            } catch (e) { toast('❌ ' + e.message, 'error'); }
         }
     </script>
 </body>

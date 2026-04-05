@@ -19,6 +19,7 @@ from app.schemas.user import (
     OTPResponse,
     ForgotPasswordRequest,
     ResetPasswordRequest,
+    GoogleAuthRequest,
 )
 from app.services.auth_service import (
     register_user,
@@ -28,6 +29,7 @@ from app.services.auth_service import (
     forgot_password,
     reset_password,
 )
+from app.services.google_auth import google_login_or_register
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -81,6 +83,20 @@ async def refresh(body: TokenRefresh, db: AsyncSession = Depends(get_db)):
 async def get_me(current_user: User = Depends(get_current_user)):
     """Mendapatkan info user yang sedang login."""
     return current_user
+
+
+# ─── Google OAuth ─────────────────────────────────────────
+
+@router.post("/google", response_model=TokenResponse)
+async def google_auth(body: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Login atau register menggunakan akun Google.
+    - Kirim Google ID token dari frontend
+    - Backend verifikasi token → auto-create/login user
+    - Return access + refresh tokens
+    """
+    user, tokens, is_new = await google_login_or_register(db, body.id_token)
+    return tokens
 
 
 # ─── Forgot / Reset Password ─────────────────────────────
