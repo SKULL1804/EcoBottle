@@ -24,6 +24,7 @@ class ScanLog(Base):
     detected_bottles: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     total_value: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
     confidence: Mapped[Decimal | None] = mapped_column(Numeric(4, 2), nullable=True)
+    barcode: Mapped[str | None] = mapped_column(String(50), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending, confirmed, rejected
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()

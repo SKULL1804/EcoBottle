@@ -27,6 +27,7 @@ class ScanResponse(BaseModel):
     total_value: Decimal
     total_points: int
     image_quality: str
+    barcode: str | None = None
     status: str = "pending"
 
 

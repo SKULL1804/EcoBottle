@@ -3,9 +3,10 @@ EcoBottle — Scanner API Routes
 POST /analyze, POST /{id}/confirm, GET /history
 """
 
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
+from typing import Optional
 
 from app.database import get_db
 from app.api.deps import get_current_user
@@ -49,6 +50,7 @@ async def preview_scan(
 @router.post("/analyze", response_model=ScanResponse)
 async def analyze_scan(
     file: UploadFile = File(..., description="Foto botol (JPG, PNG, atau WebP, maks 10MB)"),
+    barcode: Optional[str] = Form(None, description="EAN-13 barcode dari botol (opsional)"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -57,10 +59,11 @@ async def analyze_scan(
     
     Flow:
     1. Upload gambar → AI analisis → identifikasi botol & harga
-    2. Hasil scan berstatus 'pending' — user harus konfirmasi
-    3. Setelah dikonfirmasi, saldo & poin ditambahkan
+    2. Jika barcode diberikan → anti-fraud check (1x/barcode/user/hari)
+    3. Hasil scan berstatus 'pending' — user harus konfirmasi
+    4. Setelah dikonfirmasi, saldo & poin ditambahkan
     """
-    return await process_scan(db, current_user, file)
+    return await process_scan(db, current_user, file, barcode=barcode)
 
 
 @router.post("/{scan_id}/confirm", response_model=ScanConfirmResponse)

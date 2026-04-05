@@ -3,19 +3,22 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { scanApi } from "@/lib/api";
+import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType, NotFoundException } from "@zxing/library";
 
-type ScanState = "IDLE" | "SCANNING" | "DETECTED" | "CONFIRMING" | "CONFIRMED";
+type ScanState = "IDLE" | "SCANNING" | "READY" | "CONFIRMING" | "CONFIRMED";
 
 interface BBox { x1: number; y1: number; x2: number; y2: number; }
 interface Detection { bbox: BBox; class: string; label: string; type: string; confidence: number; }
 interface PreviewResult { detections: Detection[]; total_items: number; }
-interface AnalyzeResult { scan_id: string; detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[]; total_items: number; total_value: number; }
+interface AnalyzeResult { scan_id: string; detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[]; total_items: number; total_value: number; barcode?: string; }
 interface ConfirmResult { message: string; balance_added: number; points_earned: number; new_balance: number; new_points: number; gamification?: { level: number; level_title: string; new_achievements: { title: string; icon: string; description: string }[]; level_up: boolean; }; }
 
 export default function ScanViewport() {
   const { refreshUser } = useAuth();
   const [state, setState] = useState<ScanState>("IDLE");
   const [detections, setDetections] = useState<Detection[]>([]);
+  const [bottleDetected, setBottleDetected] = useState(false);
+  const [barcodeResult, setBarcodeResult] = useState<string | null>(null);
   const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResult | null>(null);
   const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
   const [error, setError] = useState("");
@@ -26,6 +29,8 @@ export default function ScanViewport() {
   const streamRef = useRef<MediaStream | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastFrameRef = useRef<Blob | null>(null);
+  const barcodeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const barcodeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startCamera = useCallback(async () => {
     try {
@@ -44,7 +49,11 @@ export default function ScanViewport() {
   }, []);
 
   useEffect(() => {
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); stopCamera(); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (barcodeIntervalRef.current) clearInterval(barcodeIntervalRef.current);
+      stopCamera();
+    };
   }, [stopCamera]);
 
   const drawBoxes = useCallback((dets: Detection[]) => {
@@ -85,11 +94,32 @@ export default function ScanViewport() {
     });
   }, []);
 
+  // --- Barcode scanning (client-side ZXing) ---
+  const startBarcodeScanner = useCallback(() => {
+    const hints = new Map();
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+      BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128,
+    ]);
+    const reader = new BrowserMultiFormatReader(hints);
+    barcodeReaderRef.current = reader;
+
+    // decodeOnceFromStream continuously scans frames until a barcode is found, then resolves
+    (async () => {
+      if (!streamRef.current || !videoRef.current) return;
+      try {
+        const result = await reader.decodeOnceFromStream(streamRef.current, videoRef.current);
+        if (result) setBarcodeResult(result.getText());
+      } catch {
+        // Cancelled via reset() or error — expected during cleanup
+      }
+    })();
+  }, []);
+
+  // --- YOLO preview ---
   const previewOneFrame = useCallback(async () => {
     const blob = await captureFrame();
     if (!blob) return;
     lastFrameRef.current = blob;
-    setStatusText("⏳ Menganalisis...");
     try {
       const { status, data } = await scanApi.preview(blob);
       if (status !== 200) return;
@@ -97,47 +127,69 @@ export default function ScanViewport() {
       setDetections(result.detections);
       drawBoxes(result.detections);
       if (result.total_items > 0) {
-        setState("DETECTED");
+        setBottleDetected(true);
         if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-        setStatusText(`✅ ${result.total_items} botol terdeteksi!`);
-      } else {
-        setStatusText("🔍 Mencari botol... arahkan kamera ke botol");
       }
-    } catch { setStatusText("⚠️ Koneksi gagal, mencoba lagi..."); }
+    } catch { /* retry next interval */ }
   }, [captureFrame, drawBoxes]);
 
+  // --- Auto-transition to READY when both checks pass ---
+  useEffect(() => {
+    if (state === "SCANNING" && bottleDetected && barcodeResult) {
+      setState("READY");
+      setStatusText(`✅ Botol terdeteksi • Barcode: ${barcodeResult}`);
+    } else if (state === "SCANNING") {
+      const parts: string[] = [];
+      parts.push(bottleDetected ? "🤖 AI ✅" : "🤖 AI scanning...");
+      parts.push(barcodeResult ? `📊 Barcode ✅` : "📊 Barcode scanning...");
+      setStatusText(parts.join("  •  "));
+    }
+  }, [bottleDetected, barcodeResult, state]);
+
   const startScanning = useCallback(async () => {
-    setError(""); setAnalyzeResult(null); setConfirmResult(null); setDetections([]);
+    setError(""); setAnalyzeResult(null); setConfirmResult(null);
+    setDetections([]); setBottleDetected(false); setBarcodeResult(null);
     setState("SCANNING"); await startCamera();
     setStatusText("🔍 Memulai deteksi...");
-    setTimeout(() => { previewOneFrame(); intervalRef.current = setInterval(previewOneFrame, 3000); }, 1000);
-  }, [startCamera, previewOneFrame]);
+    setTimeout(() => {
+      previewOneFrame();
+      intervalRef.current = setInterval(previewOneFrame, 3000);
+      startBarcodeScanner();
+    }, 1000);
+  }, [startCamera, previewOneFrame, startBarcodeScanner]);
 
   const handleConfirm = async () => {
     setState("CONFIRMING"); setStatusText("📦 Menyetorkan botol...");
     const blob = lastFrameRef.current || await captureFrame();
-    if (!blob) { setError("Gagal menangkap frame"); setState("DETECTED"); return; }
+    if (!blob) { setError("Gagal menangkap frame"); setState("READY"); return; }
     try {
-      const { status: aS, data: aD } = await scanApi.analyze(blob);
-      if (aS !== 200) { setError((aD as { detail?: string }).detail || "Analisis gagal"); setState("DETECTED"); return; }
+      const { status: aS, data: aD } = await scanApi.analyze(blob, barcodeResult || undefined);
+      if (aS === 409) { setError((aD as { detail?: string }).detail || "Barcode sudah di-scan hari ini"); setState("READY"); return; }
+      if (aS !== 200) { setError((aD as { detail?: string }).detail || "Analisis gagal"); setState("READY"); return; }
       const aResult = aD as AnalyzeResult;
       setAnalyzeResult(aResult);
       const { status: cS, data: cD } = await scanApi.confirm(aResult.scan_id);
-      if (cS !== 200) { setError((cD as { detail?: string }).detail || "Konfirmasi gagal"); setState("DETECTED"); return; }
+      if (cS !== 200) { setError((cD as { detail?: string }).detail || "Konfirmasi gagal"); setState("READY"); return; }
       setConfirmResult(cD as ConfirmResult);
       setState("CONFIRMED"); setStatusText("🎉 Berhasil disetor!");
       await refreshUser();
-    } catch { setError("Koneksi gagal saat menyetor"); setState("DETECTED"); }
+    } catch { setError("Koneksi gagal saat menyetor"); setState("READY"); }
   };
 
   const scanAgain = () => {
-    setDetections([]); setAnalyzeResult(null); setConfirmResult(null); setError(""); stopCamera(); setState("IDLE");
+    setDetections([]); setAnalyzeResult(null); setConfirmResult(null);
+    setError(""); setBottleDetected(false); setBarcodeResult(null);
+    stopCamera(); setState("IDLE");
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    if (barcodeIntervalRef.current) { clearInterval(barcodeIntervalRef.current); barcodeIntervalRef.current = null; }
     if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
   const stopScanning = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    stopCamera(); setDetections([]); setState("IDLE"); setStatusText("");
+    if (barcodeIntervalRef.current) { clearInterval(barcodeIntervalRef.current); barcodeIntervalRef.current = null; }
+    stopCamera(); setDetections([]); setBottleDetected(false); setBarcodeResult(null);
+    setState("IDLE"); setStatusText("");
     if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
@@ -152,6 +204,7 @@ export default function ScanViewport() {
               <div className="absolute inset-0 flex items-center justify-center flex-col">
                 <span className="material-symbols-outlined text-primary-fixed text-7xl mb-4 opacity-60">qr_code_scanner</span>
                 <p className="text-primary-fixed/70 text-sm font-medium">Tekan tombol di bawah untuk mulai scan</p>
+                <p className="text-primary-fixed/50 text-xs mt-2">AI Deteksi Botol + Barcode Scanner</p>
               </div>
             )}
             {state !== "IDLE" && (
@@ -159,9 +212,33 @@ export default function ScanViewport() {
                 <p className="text-primary-fixed text-sm font-semibold">{statusText}</p>
               </div>
             )}
-            {state === "SCANNING" && <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-0.5 bg-primary-fixed/60 animate-pulse" />}
+            {state === "SCANNING" && !bottleDetected && <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-0.5 bg-primary-fixed/60 animate-pulse" />}
           </div>
         </div>
+
+        {/* Dual Status Indicators */}
+        {(state === "SCANNING" || state === "READY") && (
+          <div className="grid grid-cols-2 gap-3">
+            <div className={`p-4 rounded-xl flex items-center gap-3 transition-all ${bottleDetected ? "bg-primary/10 border border-primary/20" : "bg-surface-container border border-outline-variant/15"}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${bottleDetected ? "bg-primary text-on-primary" : "bg-surface-container-high text-outline"}`}>
+                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: bottleDetected ? '"FILL" 1' : '"FILL" 0' }}>{bottleDetected ? "check_circle" : "smart_toy"}</span>
+              </div>
+              <div>
+                <p className={`text-sm font-bold ${bottleDetected ? "text-primary" : "text-tertiary"}`}>{bottleDetected ? "Botol Terdeteksi" : "AI Scanning..."}</p>
+                <p className="text-tertiary text-[10px]">YOLOv8 Detection</p>
+              </div>
+            </div>
+            <div className={`p-4 rounded-xl flex items-center gap-3 transition-all ${barcodeResult ? "bg-primary/10 border border-primary/20" : "bg-surface-container border border-outline-variant/15"}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${barcodeResult ? "bg-primary text-on-primary" : "bg-surface-container-high text-outline"}`}>
+                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: barcodeResult ? '"FILL" 1' : '"FILL" 0' }}>{barcodeResult ? "check_circle" : "barcode_scanner"}</span>
+              </div>
+              <div>
+                <p className={`text-sm font-bold ${barcodeResult ? "text-primary" : "text-tertiary"}`}>{barcodeResult ? `EAN: ${barcodeResult}` : "Barcode Scanning..."}</p>
+                <p className="text-tertiary text-[10px]">EAN-13 Decode</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {state === "IDLE" && (
           <button onClick={startScanning} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
@@ -174,11 +251,11 @@ export default function ScanViewport() {
             <span className="material-symbols-outlined text-2xl">stop_circle</span> Stop Scan
           </button>
         )}
-        {state === "DETECTED" && (
+        {state === "READY" && (
           <div className="flex gap-3">
             <button onClick={handleConfirm} className="flex-1 py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
-              Setorkan {detections.length} Botol
+              Setorkan Botol
             </button>
             <button onClick={scanAgain} className="px-6 py-5 rounded-2xl font-bold text-lg bg-surface-container-high text-tertiary hover:scale-[1.02] active:scale-[0.98] transition-all">↻</button>
           </div>
@@ -197,7 +274,7 @@ export default function ScanViewport() {
       </div>
 
       <div className="lg:col-span-2 flex flex-col gap-6">
-        {state === "DETECTED" && detections.length > 0 && (
+        {(state === "READY" || state === "SCANNING") && detections.length > 0 && (
           <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl">eco</span></div>
@@ -213,6 +290,14 @@ export default function ScanViewport() {
                 </div>
               ))}
             </div>
+            {barcodeResult && (
+              <div className="mt-4 p-3 bg-primary/5 rounded-xl border border-primary/15">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-lg">barcode</span>
+                  <div><p className="font-bold text-on-surface text-sm">Barcode: {barcodeResult}</p><p className="text-tertiary text-[10px]">Produk teridentifikasi via EAN-13</p></div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -231,6 +316,12 @@ export default function ScanViewport() {
                 <span className="text-tertiary text-sm">Poin</span>
                 <span className="font-bold text-primary text-sm">+{confirmResult.points_earned ?? 0} poin</span>
               </div>
+              {barcodeResult && (
+                <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
+                  <span className="text-tertiary text-sm">Barcode</span>
+                  <span className="font-bold text-on-surface text-sm">{barcodeResult}</span>
+                </div>
+              )}
             </div>
             {confirmResult.gamification && (
               <div className="mt-4 space-y-3">
@@ -260,9 +351,10 @@ export default function ScanViewport() {
             <h4 className="font-bold text-on-surface font-headline mb-4">Cara Scan</h4>
             <div className="space-y-4">
               {[
-                { icon: "center_focus_strong", title: "Mulai Scan", desc: "Tekan tombol untuk aktifkan kamera" },
-                { icon: "search", title: "AI Deteksi Real-Time", desc: "Kotak hijau muncul di sekeliling botol yang terdeteksi" },
-                { icon: "check_circle", title: "Konfirmasi", desc: "Tekan \"Setorkan\" untuk menyetor botol dan dapatkan saldo" },
+                { icon: "center_focus_strong", title: "Mulai Scan", desc: "Aktifkan kamera dengan tombol di bawah" },
+                { icon: "smart_toy", title: "AI Deteksi Botol", desc: "YOLO mendeteksi apakah objek adalah botol" },
+                { icon: "barcode_scanner", title: "Barcode Scan", desc: "ZXing membaca barcode EAN-13 dari botol" },
+                { icon: "check_circle", title: "Konfirmasi", desc: "Kedua check lolos → tekan Setorkan untuk saldo" },
               ].map((step, i) => (
                 <div key={step.title} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">

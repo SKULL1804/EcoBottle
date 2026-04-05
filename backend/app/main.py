@@ -79,6 +79,7 @@ from app.api.v1.stats import router as stats_router
 
 # Ensure all models are imported for table creation
 from app.models.achievement import Achievement  # noqa: F401
+from app.models.scanned_barcode import ScannedBarcode  # noqa: F401
 
 API_V1_PREFIX = "/api/v1"
 

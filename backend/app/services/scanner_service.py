@@ -19,6 +19,8 @@ from app.schemas.scanner import DetectedBottle, ScanResponse, ScanConfirmRespons
 from app.utils.vision_client import analyze_bottle_image
 from app.services.pricing_service import get_price_for_bottle, calculate_points
 from app.services.gamification_service import process_gamification
+from app.models.scanned_barcode import ScannedBarcode
+from datetime import date
 
 settings = get_settings()
 
@@ -31,6 +33,7 @@ async def process_scan(
     db: AsyncSession,
     user: User,
     file: UploadFile,
+    barcode: str | None = None,
 ) -> ScanResponse:
     """
     Process a bottle scan:
@@ -54,7 +57,22 @@ async def process_scan(
             detail="Ukuran file terlalu besar. Maksimal 10MB.",
         )
 
-    # 2. Save image locally
+    # 2. Anti-fraud barcode check
+    if barcode:
+        existing = await db.execute(
+            select(ScannedBarcode).where(
+                ScannedBarcode.user_id == user.id,
+                ScannedBarcode.barcode == barcode,
+                ScannedBarcode.scanned_date == date.today(),
+            )
+        )
+        if existing.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Barcode {barcode} sudah di-scan hari ini. Gunakan botol lain.",
+            )
+
+    # 3. Save image locally
     upload_dir = Path(settings.UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
     
@@ -112,8 +130,16 @@ async def process_scan(
         },
         total_value=total_value,
         confidence=Decimal(str(round(avg_confidence, 2))),
+        barcode=barcode,
         status="pending",
     )
+    # Record barcode usage for anti-fraud
+    if barcode:
+        db.add(ScannedBarcode(
+            user_id=user.id,
+            barcode=barcode,
+            scanned_date=date.today(),
+        ))
     db.add(scan_log)
     await db.flush()
 
@@ -124,6 +150,7 @@ async def process_scan(
         total_value=total_value,
         total_points=total_points,
         image_quality=ai_result.get("image_quality", "good"),
+        barcode=barcode,
         status="pending",
     )
 

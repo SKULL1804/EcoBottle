@@ -51,7 +51,12 @@ export const authApi = {
 
 export const scanApi = {
     preview: (file: Blob) => uploadFile("/scan/preview", file, "preview.jpg"),
-    analyze: (file: Blob) => uploadFile("/scan/analyze", file, "capture.jpg"),
+    analyze: (file: Blob, barcode?: string) => {
+        const formData = new FormData();
+        formData.append("file", file, "capture.jpg");
+        if (barcode) formData.append("barcode", barcode);
+        return api("POST", "/scan/analyze", formData, { formData: true });
+    },
     confirm: (scanId: string) => api("POST", `/scan/${scanId}/confirm`),
     history: (skip = 0, limit = 20) => api("GET", `/scan/history?skip=${skip}&limit=${limit}`),
 };
