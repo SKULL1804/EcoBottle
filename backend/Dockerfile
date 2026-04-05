@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 # System dependencies for OpenCV (YOLOv8) + gcc for asyncpg build
 RUN apt-get update && apt-get install -y --no-install-recommends \
