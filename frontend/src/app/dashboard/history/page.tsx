@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HistoryList from "@/components/history/HistoryList";
+import ExportButton from "@/components/history/ExportButton";
 
 export const metadata: Metadata = {
   title: "Riwayat — EcoBottle",
@@ -20,15 +21,11 @@ export default function HistoryPage() {
             Seluruh transaksi & aktivitas akun Anda
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-surface-container-high px-4 py-2.5 rounded-full text-on-surface text-sm font-bold hover:bg-surface-container-highest transition-colors">
-          <span className="material-symbols-outlined text-lg">
-            download
-          </span>
-          Export
-        </button>
+        <ExportButton />
       </header>
 
       <HistoryList />
     </>
   );
 }
+

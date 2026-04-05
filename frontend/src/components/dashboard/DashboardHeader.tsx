@@ -11,8 +11,8 @@ export default function DashboardHeader() {
         <p className="text-tertiary">Eco-warrior since 2023 • Level 12</p>
       </div>
       <div className="flex gap-4 items-center">
-        <button className="p-3 bg-surface-container-low rounded-full text-on-surface hover:bg-surface-container transition-colors">
-          <span className="material-symbols-outlined">notifications</span>
+        <button className="p-3 bg-surface-container-low rounded-full text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center">
+          <span className="material-symbols-outlined">logout</span>
         </button>
         <Link
           href="/dashboard/profile"

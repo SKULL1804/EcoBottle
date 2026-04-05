@@ -1,0 +1,217 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+
+const MONTH_NAMES = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
+
+const SHORT_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Agu",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Des",
+];
+
+export default function MonthPicker() {
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth()); // 0-indexed
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const goToPrevMonth = () => {
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else {
+      setMonth((m) => m - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    // Don't go beyond current month
+    const isCurrentMonth =
+      year === now.getFullYear() && month === now.getMonth();
+    if (isCurrentMonth) return;
+
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else {
+      setMonth((m) => m + 1);
+    }
+  };
+
+  const selectMonth = (m: number) => {
+    // Don't allow future months in current year
+    if (year === now.getFullYear() && m > now.getMonth()) return;
+    setMonth(m);
+    setOpen(false);
+  };
+
+  const isCurrentMonth =
+    year === now.getFullYear() && month === now.getMonth();
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      {/* Trigger Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 bg-secondary-container px-4 py-2.5 rounded-full hover:bg-secondary-container/80 transition-colors cursor-pointer"
+      >
+        <span className="material-symbols-outlined text-primary text-lg">
+          calendar_month
+        </span>
+        <span className="text-on-secondary-container text-sm font-bold">
+          {MONTH_NAMES[month]} {year}
+        </span>
+        <span
+          className={`material-symbols-outlined text-on-secondary-container/60 text-base transition-transform ${open ? "rotate-180" : ""}`}
+        >
+          expand_more
+        </span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute right-0 top-full mt-2 bg-surface-container-lowest rounded-2xl shadow-[0px_24px_48px_rgba(17,28,45,0.15)] border border-outline-variant/10 overflow-hidden z-50 w-[280px]">
+          {/* Year Navigation */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant/10">
+            <button
+              onClick={() => setYear((y) => y - 1)}
+              className="p-1.5 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center"
+            >
+              <span className="material-symbols-outlined text-on-surface text-lg">
+                chevron_left
+              </span>
+            </button>
+            <span className="text-on-surface font-bold font-headline">
+              {year}
+            </span>
+            <button
+              onClick={() => {
+                if (year < now.getFullYear()) setYear((y) => y + 1);
+              }}
+              className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${
+                year >= now.getFullYear()
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:bg-surface-container"
+              }`}
+              disabled={year >= now.getFullYear()}
+            >
+              <span className="material-symbols-outlined text-on-surface text-lg">
+                chevron_right
+              </span>
+            </button>
+          </div>
+
+          {/* Month Grid */}
+          <div className="grid grid-cols-3 gap-1.5 p-3">
+            {SHORT_MONTHS.map((name, i) => {
+              const isFuture =
+                year === now.getFullYear() && i > now.getMonth();
+              const isSelected = i === month && year === year;
+              const isToday =
+                i === now.getMonth() && year === now.getFullYear();
+
+              return (
+                <button
+                  key={name}
+                  onClick={() => !isFuture && selectMonth(i)}
+                  disabled={isFuture}
+                  className={`relative py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    isSelected
+                      ? "gradient-primary text-on-primary shadow-md shadow-primary/20 scale-[1.02]"
+                      : isFuture
+                        ? "text-outline/40 cursor-not-allowed"
+                        : "text-on-surface hover:bg-surface-container-high"
+                  }`}
+                >
+                  {name}
+                  {isToday && !isSelected && (
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="px-3 pb-3 flex gap-2">
+            <button
+              onClick={() => {
+                setMonth(now.getMonth());
+                setYear(now.getFullYear());
+                setOpen(false);
+              }}
+              className="flex-1 py-2 text-xs font-bold text-primary bg-primary/10 rounded-lg hover:bg-primary/15 transition-colors"
+            >
+              Bulan Ini
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Prev/Next Inline Controls (visible when dropdown closed) */}
+      {!open && (
+        <div className="absolute -left-20 top-1/2 -translate-y-1/2 flex gap-1">
+          <button
+            onClick={goToPrevMonth}
+            className="p-1.5 rounded-full bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-center"
+          >
+            <span className="material-symbols-outlined text-on-surface text-base">
+              chevron_left
+            </span>
+          </button>
+          <button
+            onClick={goToNextMonth}
+            className={`p-1.5 rounded-full transition-colors flex items-center justify-center ${
+              isCurrentMonth
+                ? "bg-surface-container-low/50 text-outline/40 cursor-not-allowed"
+                : "bg-surface-container-low hover:bg-surface-container"
+            }`}
+            disabled={isCurrentMonth}
+          >
+            <span className="material-symbols-outlined text-on-surface text-base">
+              chevron_right
+            </span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

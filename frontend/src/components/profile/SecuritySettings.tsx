@@ -1,78 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
-interface SecurityToggle {
-  id: string;
-  icon: string;
-  label: string;
-  description: string;
-  enabled: boolean;
-}
-
-const INITIAL_TOGGLES: SecurityToggle[] = [
-  {
-    id: "2fa",
-    icon: "security",
-    label: "Two-Factor Auth (2FA)",
-    description: "Tambahkan lapisan keamanan ekstra saat login",
-    enabled: true,
-  },
-  {
-    id: "biometric",
-    icon: "fingerprint",
-    label: "Login Biometrik",
-    description: "Gunakan sidik jari atau Face ID untuk login",
-    enabled: false,
-  },
-  {
-    id: "login_alert",
-    icon: "notifications_active",
-    label: "Notifikasi Login",
-    description: "Dapatkan notifikasi saat ada login baru di perangkat lain",
-    enabled: true,
-  },
-  {
-    id: "activity_log",
-    icon: "visibility",
-    label: "Log Aktivitas",
-    description: "Simpan riwayat semua aktivitas akun Anda",
-    enabled: true,
-  },
+const PASSWORD_RULES = [
+  { icon: "check_circle", label: "Minimal 8 karakter", met: true },
+  { icon: "check_circle", label: "Huruf besar & kecil", met: true },
+  { icon: "check_circle", label: "Mengandung angka", met: false },
+  { icon: "check_circle", label: "Karakter spesial (!@#$)", met: false },
 ];
 
-const LOGIN_SESSIONS = [
+const SECURITY_TIPS = [
   {
-    device: "Chrome — macOS",
-    location: "Jakarta, Indonesia",
-    time: "Sedang aktif",
-    current: true,
+    icon: "shield",
+    title: "Gunakan password unik",
+    description: "Jangan gunakan password yang sama untuk akun lain.",
   },
   {
-    device: "Safari — iPhone",
-    location: "Jakarta, Indonesia",
-    time: "2 jam lalu",
-    current: false,
+    icon: "sync_lock",
+    title: "Ganti secara berkala",
+    description: "Ubah password setiap 3-6 bulan untuk keamanan optimal.",
   },
   {
-    device: "Chrome — Windows",
-    location: "Bandung, Indonesia",
-    time: "3 hari lalu",
-    current: false,
+    icon: "password",
+    title: "Hindari info pribadi",
+    description: "Jangan masukkan nama, tanggal lahir, atau nomor telepon.",
   },
 ];
 
 export default function SecuritySettings() {
-  const [toggles, setToggles] = useState(INITIAL_TOGGLES);
   const [saved, setSaved] = useState(false);
-
-  const handleToggle = (id: string) => {
-    setToggles((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, enabled: !t.enabled } : t))
-    );
-    setSaved(false);
-  };
 
   const handleSave = () => {
     setSaved(true);
@@ -80,218 +36,242 @@ export default function SecuritySettings() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Change Password */}
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-primary/10 rounded-xl">
-            <span className="material-symbols-outlined text-primary text-xl">
-              lock
-            </span>
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* Left — Password Form */}
+      <div className="lg:col-span-3 space-y-6">
+        {/* Change Password Card */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2.5 bg-primary/10 rounded-xl flex items-center justify-center">
+              <span className="material-symbols-outlined text-primary text-xl">
+                lock
+              </span>
+            </div>
+            <div>
+              <h4 className="font-bold text-on-surface font-headline">
+                Ubah Password
+              </h4>
+              <p className="text-tertiary text-xs">
+                Terakhir diubah 30 hari lalu
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-bold text-on-surface font-headline">
-              Ubah Password
-            </h4>
-            <p className="text-tertiary text-xs">
-              Terakhir diubah 30 hari lalu
-            </p>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
+                Password Lama
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
+                  lock
+                </span>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
+                Password Baru
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
+                  key
+                </span>
+                <input
+                  type="password"
+                  placeholder="Minimal 8 karakter"
+                  className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
+                Konfirmasi Password Baru
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
+                  key
+                </span>
+                <input
+                  type="password"
+                  placeholder="Ulangi password baru"
+                  className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
+                />
+              </div>
+            </div>
+
+            {/* Password Requirements */}
+            <div className="p-4 bg-surface rounded-xl">
+              <p className="text-tertiary text-[11px] font-semibold uppercase tracking-wider mb-3">
+                Persyaratan Password
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {PASSWORD_RULES.map((rule) => (
+                  <div key={rule.label} className="flex items-center gap-2">
+                    <span
+                      className={`material-symbols-outlined text-sm ${
+                        rule.met ? "text-primary" : "text-outline"
+                      }`}
+                      style={{
+                        fontVariationSettings: rule.met
+                          ? '"FILL" 1'
+                          : '"FILL" 0',
+                      }}
+                    >
+                      {rule.met ? "check_circle" : "circle"}
+                    </span>
+                    <span
+                      className={`text-xs ${
+                        rule.met
+                          ? "text-on-surface font-medium"
+                          : "text-tertiary"
+                      }`}
+                    >
+                      {rule.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
-              Password Lama
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
-                lock
-              </span>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
-              Password Baru
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
-                key
-              </span>
-              <input
-                type="password"
-                placeholder="Minimal 8 karakter"
-                className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-tertiary text-xs font-semibold mb-2 uppercase tracking-wider">
-              Konfirmasi Password Baru
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-lg">
-                key
-              </span>
-              <input
-                type="password"
-                placeholder="Ulangi password baru"
-                className="w-full pl-12 pr-4 py-3.5 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-outline"
-              />
-            </div>
-          </div>
-          <button className="py-3 px-6 gradient-primary text-on-primary font-bold rounded-xl text-sm shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform">
-            Update Password
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={handleSave}
+            className="flex-1 py-4 gradient-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined">
+              {saved ? "check_circle" : "save"}
+            </span>
+            {saved ? "Tersimpan!" : "Simpan Pengaturan"}
           </button>
+          {/* <Link
+            href="/dashboard/profile"
+            className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-colors text-center"
+          >
+            Kembali
+          </Link> */}
         </div>
       </div>
 
-      {/* Security Toggles */}
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-        <h4 className="font-bold text-on-surface font-headline mb-6">
-          Pengaturan Keamanan
-        </h4>
+      {/* Right — Security Info */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Security Status */}
+        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-6 text-on-primary shadow-xl relative overflow-hidden">
+          <div className="absolute -top-14 -right-14 w-40 h-40 bg-primary-fixed/8 rounded-full blur-3xl" />
+          <div className="relative z-10 text-center">
+            <div className="w-16 h-16 mx-auto bg-surface-container-lowest/15 backdrop-blur-sm rounded-full flex items-center justify-center mb-4">
+              <span
+                className="material-symbols-outlined text-3xl"
+                style={{ fontVariationSettings: '"FILL" 1' }}
+              >
+                verified_user
+              </span>
+            </div>
+            <h4 className="text-xl font-black font-headline mb-1">
+              Akun Terlindungi
+            </h4>
+            <p className="text-primary-fixed/70 text-sm">
+              Password terakhir diubah 30 hari lalu
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-1">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full ${
+                    i <= 3
+                      ? "w-8 bg-primary-fixed/60"
+                      : "w-8 bg-surface-container-lowest/20"
+                  }`}
+                />
+              ))}
+              <span className="text-primary-fixed text-[11px] font-bold ml-2">
+                Kuat
+              </span>
+            </div>
+          </div>
+        </div>
 
-        <div className="space-y-3">
-          {toggles.map((t) => (
-            <div
-              key={t.id}
-              className="flex items-center justify-between p-4 bg-surface rounded-xl"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        {/* Security Tips */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+          <h4 className="font-bold text-on-surface font-headline mb-4">
+            Tips Keamanan
+          </h4>
+          <div className="space-y-4">
+            {SECURITY_TIPS.map((tip) => (
+              <div key={tip.title} className="flex gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-primary text-lg">
-                    {t.icon}
+                    {tip.icon}
                   </span>
                 </div>
                 <div>
                   <p className="font-bold text-on-surface text-sm">
-                    {t.label}
+                    {tip.title}
                   </p>
-                  <p className="text-tertiary text-[11px]">{t.description}</p>
+                  <p className="text-tertiary text-[11px] leading-relaxed">
+                    {tip.description}
+                  </p>
                 </div>
               </div>
-              {/* Toggle */}
-              <button
-                onClick={() => handleToggle(t.id)}
-                className={`w-12 h-7 rounded-full p-0.5 transition-colors duration-300 ${
-                  t.enabled ? "bg-primary" : "bg-outline-variant"
-                }`}
-              >
-                <div
-                  className={`w-6 h-6 bg-surface-container-lowest rounded-full shadow-md transition-transform duration-300 ${
-                    t.enabled ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Active Sessions */}
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-        <div className="flex justify-between items-center mb-6">
-          <h4 className="font-bold text-on-surface font-headline">
-            Sesi Aktif
+        {/* Last Activity */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+          <h4 className="font-bold text-on-surface font-headline mb-4">
+            Aktivitas Terakhir
           </h4>
-          <button className="text-error text-xs font-bold hover:underline">
-            Logout Semua
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {LOGIN_SESSIONS.map((s, i) => (
-            <div
-              key={i}
-              className={`flex items-center justify-between p-4 rounded-xl ${
-                s.current
-                  ? "bg-primary/5 border border-primary/15"
-                  : "bg-surface"
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    s.current
-                      ? "bg-primary text-on-primary"
-                      : "bg-surface-container-high text-outline"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-lg">
-                    {s.device.includes("iPhone")
-                      ? "smartphone"
-                      : "computer"}
-                  </span>
-                </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-surface rounded-xl">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-lg">
+                  login
+                </span>
                 <div>
-                  <p
-                    className={`font-bold text-sm ${
-                      s.current ? "text-primary" : "text-on-surface"
-                    }`}
-                  >
-                    {s.device}
-                    {s.current && (
-                      <span className="text-[10px] text-primary font-medium ml-2">
-                        (Perangkat ini)
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-tertiary text-[11px]">
-                    {s.location} • {s.time}
-                  </p>
+                  <p className="text-on-surface text-xs font-bold">Login</p>
+                  <p className="text-tertiary text-[10px]">Chrome — macOS</p>
                 </div>
               </div>
-              {!s.current && (
-                <button className="text-error text-xs font-bold bg-error/8 px-3 py-1.5 rounded-full hover:bg-error/15 transition-colors">
-                  Revoke
-                </button>
-              )}
+              <span className="text-tertiary text-[10px]">Hari ini</span>
             </div>
-          ))}
+            <div className="flex items-center justify-between p-3 bg-surface rounded-xl">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-lg">
+                  key
+                </span>
+                <div>
+                  <p className="text-on-surface text-xs font-bold">
+                    Password diubah
+                  </p>
+                  <p className="text-tertiary text-[10px]">Via browser</p>
+                </div>
+              </div>
+              <span className="text-tertiary text-[10px]">30 hari lalu</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-surface rounded-xl">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-lg">
+                  person_add
+                </span>
+                <div>
+                  <p className="text-on-surface text-xs font-bold">
+                    Akun dibuat
+                  </p>
+                  <p className="text-tertiary text-[10px]">Pendaftaran awal</p>
+                </div>
+              </div>
+              <span className="text-tertiary text-[10px]">Maret 2023</span>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-error/10">
-        <h4 className="font-bold text-error font-headline mb-2">
-          Zona Berbahaya
-        </h4>
-        <p className="text-tertiary text-xs mb-4">
-          Tindakan ini tidak dapat dibatalkan. Harap berhati-hati.
-        </p>
-        <div className="flex gap-3">
-          <button className="px-5 py-3 bg-error/10 text-error font-bold rounded-xl text-sm hover:bg-error/20 transition-colors">
-            Nonaktifkan Akun
-          </button>
-          <button className="px-5 py-3 bg-error text-on-error font-bold rounded-xl text-sm hover:opacity-90 transition-opacity">
-            Hapus Akun
-          </button>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className="flex-1 py-4 gradient-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-        >
-          <span className="material-symbols-outlined">
-            {saved ? "check_circle" : "save"}
-          </span>
-          {saved ? "Tersimpan!" : "Simpan Pengaturan"}
-        </button>
-        <Link
-          href="/dashboard/profile"
-          className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-surface-container-highest transition-colors text-center"
-        >
-          Kembali
-        </Link>
       </div>
     </div>
   );

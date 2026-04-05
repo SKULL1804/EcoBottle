@@ -3,7 +3,7 @@ export interface PaymentMethod {
   icon: string;
   name: string;
   connected: boolean;
-  balance?: string;
+  phone?: string;
 }
 
 /** Withdrawal option. */

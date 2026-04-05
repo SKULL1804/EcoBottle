@@ -8,13 +8,13 @@ export default function ProcessSection() {
         {PROCESS_STEPS.map((step) => (
           <div
             key={step.title}
-            className={`bg-surface-container-lowest p-8 rounded-xl flex flex-col justify-between min-h-[400px] shadow-sm hover:shadow-md transition-shadow ${
+            className={`bg-surface-container-lowest p-8 rounded-xl flex flex-col justify-between min-h-100 shadow-sm hover:shadow-md transition-shadow ${
               step.accent ? "border-2 border-primary-container/20" : ""
             }`}
           >
             <div>
               <div className="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center mb-6">
-                <span className="material-symbols-outlined text-on-primary-container">
+                <span className="material-symbols-outlined text-on-primary">
                   {step.icon}
                 </span>
               </div>

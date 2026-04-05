@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { WITHDRAW_OPTIONS } from "@/constants/wallet";
 
 export default function WithdrawCard() {
@@ -42,6 +43,15 @@ export default function WithdrawCard() {
           </div>
         ))}
       </div>
+
+      <Link
+        href="/dashboard/withdraw"
+        className="mt-4 w-full py-3 gradient-primary text-on-primary font-bold rounded-xl text-sm shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+      >
+        <span className="material-symbols-outlined text-lg">send</span>
+        Tarik Saldo Sekarang
+      </Link>
     </div>
   );
 }
+

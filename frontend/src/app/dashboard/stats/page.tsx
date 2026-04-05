@@ -5,6 +5,7 @@ import BottleBreakdown from "@/components/stats/BottleBreakdown";
 import MonthlyTrend from "@/components/stats/MonthlyTrend";
 import AchievementGrid from "@/components/stats/AchievementGrid";
 import Leaderboard from "@/components/stats/Leaderboard";
+import MonthPicker from "@/components/stats/MonthPicker";
 
 export const metadata: Metadata = {
   title: "Statistik — EcoBottle",
@@ -25,14 +26,7 @@ export default function StatsPage() {
             Pantau progress daur ulang & dampak lingkungan
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-secondary-container px-4 py-2 rounded-full">
-          <span className="material-symbols-outlined text-primary text-lg">
-            calendar_month
-          </span>
-          <span className="text-on-secondary-container text-sm font-bold">
-            April 2026
-          </span>
-        </div>
+        <MonthPicker />
       </header>
 
       {/* Overview Cards */}

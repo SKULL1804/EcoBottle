@@ -8,7 +8,6 @@ export default function PaymentMethods() {
           E-Wallet Terhubung
         </h4>
         <button className="text-primary text-xs font-bold hover:underline flex items-center gap-1">
-          <span className="material-symbols-outlined text-sm">add</span>
           Tambah
         </button>
       </div>
@@ -44,7 +43,7 @@ export default function PaymentMethods() {
                   {pm.name}
                 </p>
                 <p className="text-[11px] text-tertiary">
-                  {pm.connected ? pm.balance : "Belum terhubung"}
+                  {pm.connected ? pm.phone : "Belum terhubung"}
                 </p>
               </div>
             </div>

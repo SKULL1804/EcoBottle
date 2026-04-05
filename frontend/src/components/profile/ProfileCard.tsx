@@ -5,7 +5,7 @@ export default function ProfileCard() {
   const p = USER_PROFILE;
 
   return (
-    <div className="bg-gradient-to-br from-on-primary-container to-primary rounded-2xl p-8 text-on-primary shadow-xl relative overflow-hidden">
+    <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-8 text-on-primary shadow-xl relative overflow-hidden">
       {/* Decorative  */}
       <div className="absolute -top-20 -right-20 w-56 h-56 bg-primary-fixed/8 rounded-full blur-3xl" />
       <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-surface-container-lowest/5 rounded-full blur-2xl" />

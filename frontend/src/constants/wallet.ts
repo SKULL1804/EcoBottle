@@ -1,9 +1,18 @@
-import type { PaymentMethod, WithdrawOption, WalletTransaction } from "@/types/wallet";
+import type {
+  PaymentMethod,
+  WithdrawOption,
+  WalletTransaction,
+} from "@/types/wallet";
 
 /* ─── Payment Methods ─── */
 export const PAYMENT_METHODS: PaymentMethod[] = [
-  { icon: "account_balance", name: "GoPay", connected: true, balance: "Rp 150.000" },
-  { icon: "payments", name: "OVO", connected: true, balance: "Rp 85.000" },
+  {
+    icon: "account_balance",
+    name: "GoPay",
+    connected: true,
+    phone: "0812-3456-7890",
+  },
+  { icon: "payments", name: "OVO", connected: true, phone: "0812-3456-7891" },
   { icon: "shopping_bag", name: "ShopeePay", connected: false },
   { icon: "credit_card", name: "DANA", connected: false },
 ];
@@ -11,7 +20,12 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
 /* ─── Withdraw Options ─── */
 export const WITHDRAW_OPTIONS: WithdrawOption[] = [
   { icon: "bolt", label: "Instant", fee: "Rp 1.000", duration: "< 1 menit" },
-  { icon: "schedule", label: "Regular", fee: "Gratis", duration: "1-2 hari kerja" },
+  {
+    icon: "schedule",
+    label: "Regular",
+    fee: "Gratis",
+    duration: "1-2 hari kerja",
+  },
 ];
 
 /* ─── Wallet Transactions ─── */
