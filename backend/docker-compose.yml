@@ -1,7 +1,18 @@
 version: "3.8"
 
 services:
-  # PostgreSQL (for production-like setup)
+  app:
+    build: .
+    container_name: ecobottle-api
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
   postgres:
     image: postgres:15-alpine
     container_name: ecobottle-db
@@ -13,13 +24,14 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
-  # Redis (for caching & session)
   redis:
     image: redis:7-alpine
     container_name: ecobottle-redis
     ports:
       - "6379:6379"
+    restart: unless-stopped
 
 volumes:
   postgres_data:
