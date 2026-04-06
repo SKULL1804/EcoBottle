@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install Python deps first (cached layer)
+# Step 1: Install CPU-only PyTorch (~200MB instead of ~2.5GB GPU version)
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Step 2: Install remaining deps (ultralytics will skip torch since already installed)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -19,7 +19,8 @@ pydantic==2.9.0
 pydantic-settings==2.5.0
 email-validator==2.2.0
 
-# AI & Image Processing (YOLOv8 — local inference, no API key needed)
+# AI & Image Processing (YOLOv8 — CPU only, no GPU needed on server)
+# torch CPU installed via Dockerfile --extra-index-url
 ultralytics>=8.2.0
 Pillow==10.4.0
 
