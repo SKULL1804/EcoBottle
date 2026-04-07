@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const MENU_ITEMS = [
-  { icon: "person", label: "Edit Profil", description: "Ubah nama, email, dan foto profil", href: "/dashboard/profile/edit" },
+  // { icon: "person", label: "Edit Profil", description: "Ubah nama, email, dan foto profil", href: "/dashboard/profile/edit" },
   { icon: "lock", label: "Keamanan", description: "Password, 2FA, dan privasi", href: "/dashboard/profile/security" },
   { icon: "language", label: "Bahasa", description: "Indonesia" },
   { icon: "help", label: "Bantuan & FAQ", description: "Pusat bantuan dan pertanyaan" },
@@ -49,8 +49,8 @@ export default function SettingsMenu() {
           );
         })}
 
-        <div className="border-t border-surface-container my-3" />
-        <button onClick={handleLogout} className="w-full flex items-center justify-between p-4 rounded-xl transition-all group hover:bg-error-container/30">
+        <div className="lg:hidden border-t border-surface-container my-3" />
+        <button onClick={handleLogout} className="lg:hidden w-full flex items-center justify-between p-4 rounded-xl transition-all group hover:bg-error-container/30">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-error/10 text-error flex items-center justify-center transition-colors">
               <span className="material-symbols-outlined text-xl">logout</span>

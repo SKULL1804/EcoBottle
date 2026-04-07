@@ -17,11 +17,13 @@ export default function BottomNav() {
             href={item.href}
             className={
               isActive
-                ? "flex flex-col items-center justify-center gradient-primary text-on-primary rounded-full p-3 mb-4 scale-110 shadow-lg transition-transform active:scale-90 duration-150"
+                ? "flex flex-col items-center justify-center gradient-primary text-on-primary rounded-full p-3 mb-4 scale-110 shadow-lg w-[56px] h-[56px] transition-transform active:scale-90 duration-150"
                 : "flex flex-col items-center justify-center text-outline p-2 hover:text-primary transition-transform active:scale-90 duration-150"
+
+                
             }
           >
-            <span className="material-symbols-outlined">{item.icon}</span>
+            <span className="material-symbols-outlined flex items-center justify-center">{item.icon}</span>
             <span className="font-headline text-[10px] font-semibold">
               {item.label}
             </span>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import StatsOverview from "@/components/stats/StatsOverview";
 import WeeklyChart from "@/components/stats/WeeklyChart";
-import BottleBreakdown from "@/components/stats/BottleBreakdown";
+import EnvironmentalImpact from "@/components/stats/EnvironmentalImpact";
 import MonthlyTrend from "@/components/stats/MonthlyTrend";
 import AchievementGrid from "@/components/stats/AchievementGrid";
 import Leaderboard from "@/components/stats/Leaderboard";
@@ -38,7 +38,7 @@ export default function StatsPage() {
           <WeeklyChart />
         </div>
         <div className="lg:col-span-2">
-          <BottleBreakdown />
+          <EnvironmentalImpact />
         </div>
       </div>
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HeroSection() {
   return (
     <section id="hero" className="max-w-7xl mx-auto px-8 py-20 text-center">
@@ -22,12 +24,13 @@ export default function HeroSection() {
       </p>
 
       <div className="flex flex-col md:flex-row justify-center gap-4">
-        <button
+        <Link
+          href="/login"
           id="hero-cta-primary"
           className="gradient-primary text-on-primary px-10 py-4 rounded-full font-bold text-lg shadow-xl hover:shadow-primary/20 transition-all"
         >
           Mulai Sekarang
-        </button>
+        </Link>
         <button
           id="hero-cta-secondary"
           className="bg-surface-container-high text-on-surface px-10 py-4 rounded-full font-bold text-lg hover:bg-surface-container-highest transition-all"

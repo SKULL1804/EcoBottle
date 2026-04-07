@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ScanCard() {
   return (
@@ -24,7 +25,10 @@ export default function ScanCard() {
       </div>
 
       <div className="relative z-10 mt-8">
-        <button className="group flex items-center justify-between w-full p-4 bg-surface-container-lowest/10 backdrop-blur-md rounded-2xl hover:bg-surface-container-lowest/20 transition-all">
+        <Link 
+          href="/dashboard/scan"
+          className="group flex items-center justify-between w-full p-4 bg-surface-container-lowest/10 backdrop-blur-md rounded-2xl hover:bg-surface-container-lowest/20 transition-all cursor-pointer"
+        >
           <div className="flex items-center gap-4">
             <div className="bg-surface-container-lowest flex items-center justify-center p-3 rounded-xl text-primary">
               <span
@@ -39,7 +43,7 @@ export default function ScanCard() {
           <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">
             arrow_forward
           </span>
-        </button>
+        </Link>
       </div>
     </section>
   );

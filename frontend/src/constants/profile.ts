@@ -14,12 +14,12 @@ export const USER_PROFILE: ProfileInfo = {
 
 /* ─── Settings Menu ─── */
 export const SETTINGS_MENU: SettingsMenuItem[] = [
-  {
-    icon: "person",
-    label: "Edit Profil",
-    description: "Ubah nama, email, dan foto profil",
-    href: "/dashboard/profile/edit",
-  },
+  // {
+  //   icon: "person",
+  //   label: "Edit Profil",
+  //   description: "Ubah nama, email, dan foto profil",
+  //   href: "/dashboard/profile/edit",
+  // },
   {
     icon: "lock",
     label: "Keamanan",

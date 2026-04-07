@@ -20,7 +20,6 @@ export default function Sidebar() {
       {/* Brand */}
       <div className="px-4 py-6 mb-4">
         <h1 className="text-xl font-bold text-primary">EcoBottle</h1>
-        {user && <p className="text-xs text-tertiary mt-1">{user.level_title}</p>}
       </div>
 
       {/* User info */}
@@ -36,6 +35,7 @@ export default function Sidebar() {
           <div className="min-w-0">
             <p className="font-bold text-on-surface text-sm truncate">{user.name}</p>
             <p className="text-tertiary text-[10px] truncate">{user.email}</p>
+            {user && <p className="text-xs text-tertiary mt-1">{user.level_title}</p>}
           </div>
         </div>
       )}

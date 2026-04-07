@@ -1,4 +1,5 @@
 import { NAV_LINKS } from "@/constants/landing";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -27,12 +28,13 @@ export default function Navbar() {
           ))}
         </div>
 
-        <button
+        <Link
+          href="/login"
           id="nav-cta"
           className="gradient-primary text-on-primary px-6 py-2.5 rounded-full font-semibold scale-95 duration-200 transition-transform hover:scale-100 active:scale-90"
         >
           Get Started
-        </button>
+        </Link>
       </div>
     </nav>
   );

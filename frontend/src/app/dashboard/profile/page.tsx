@@ -23,10 +23,13 @@ export default function ProfilePage() {
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
+          <div>
+
           <h2 className="text-3xl font-extrabold tracking-tight text-on-background font-headline">
             Profil & Pengaturan
           </h2>
           <p className="text-tertiary">Kelola akun dan preferensi Anda</p>
+          </div>
         </div>
       </header>
 
