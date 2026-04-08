@@ -1,11 +1,11 @@
 import type { ProcessStep, ImpactStat, NavLink } from "@/types";
 
 /* ─── Navigation Links ─── */
-export const NAV_LINKS: NavLink[] = [
-  { label: "Product", href: "#", active: true },
-  { label: "Impact", href: "#impact" },
-  { label: "Stories", href: "#features" },
-  { label: "FAQ", href: "#" },
+export const NAV_LINKS = [
+  { label: "Beranda", href: "#hero" },
+  { label: "Cara Kerja", href: "#process" },
+  { label: "Fitur Utama", href: "#features" },
+  { label: "Dampak", href: "#impact" },
 ];
 
 /* ─── Footer Links ─── */
@@ -19,13 +19,13 @@ export const FOOTER_LINKS = [
 /* ─── Process Steps ─── */
 export const PROCESS_STEPS: ProcessStep[] = [
   {
-    icon: "nest_eco_leaf",
-    title: "Masukkan Botol",
+    icon: "barcode_scanner",
+    title: "Validasi Barcode",
     description:
-      "Temukan mesin EcoBottle terdekat dan masukkan botol plastik PET Anda.",
+      "Arahkan kamera ponsel Anda ke barcode kemasan (EAN-13) untuk memastikan botol tersebut belum pernah diklaim.",
     image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAQ5RhkYUmTvEhggMqVOviy2gpdKvTWoP9rq_M62lryk76tOSByvLL87NHeamKPNAd_UcTFdlladKfnD-ddqywzLGB-KYJMynZITjuAKsx71uv3BxV4EbQmvUm2Z1iyL8grl4aBikoTXjGLE8GRrXdn1ZFyNVHcN1zqhuvhH_VsMv0N_Mb32sL9oNjLz777HA7VnThqsUYHIVPgZqL640cKc3hl81EodcM5qCmgOnJYmPsOuOc3Q4TfrvA4GhecSz9NNDjuqc8Puw",
-    alt: "Modern minimalist smart recycling kiosk in a bright urban shopping mall",
+      "/images/barcode_validation.png",
+    alt: "Futuristic digital scanner interface capturing a product barcode",
     accent: false,
   },
   {
@@ -52,7 +52,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
 
 /* ─── Impact Statistics ─── */
 export const IMPACT_STATS: ImpactStat[] = [
-  { value: "10K+", label: "Bottles Recycled" },
-  { value: "500kg", label: "Plastic Saved" },
-  { value: "2K+", label: "Active Users" },
+  { value: "10K+", label: "Botol Didaur Ulang" },
+  { value: "500kg", label: "Plastik Terselamatkan" },
+  { value: "2K+", label: "Pengguna Aktif" },
 ];

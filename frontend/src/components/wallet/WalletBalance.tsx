@@ -31,12 +31,15 @@ export default function WalletBalance() {
           Rp {Number(balance).toLocaleString("id")}
         </h2>
 
-        <div className="grid grid-cols-3 gap-3">
-          <Link href="/dashboard/withdraw" className="py-3 bg-surface-container-lowest text-primary font-bold rounded-xl text-sm hover:scale-[1.03] active:scale-[0.97] transition-transform shadow-lg text-center">
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/dashboard/withdraw" className="py-3 bg-surface-container-lowest text-primary font-bold rounded-xl text-sm hover:scale-[1.03] active:scale-[0.97] transition-transform shadow-lg text-center flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined text-lg">payments</span>
             Withdraw
           </Link>
-          <button className="py-3 bg-surface-container-lowest/15 backdrop-blur-sm text-on-primary font-bold rounded-xl text-sm hover:bg-surface-container-lowest/25 transition-colors">Top Up</button>
-          <button className="py-3 bg-surface-container-lowest/15 backdrop-blur-sm text-on-primary font-bold rounded-xl text-sm hover:bg-surface-container-lowest/25 transition-colors">Transfer</button>
+          <Link href="/dashboard/history" className="py-3 bg-surface-container-lowest/15 backdrop-blur-sm text-on-primary font-bold rounded-xl text-sm hover:bg-surface-container-lowest/25 transition-all text-center flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined text-lg">history</span>
+            Riwayat
+          </Link>
         </div>
       </div>
     </div>

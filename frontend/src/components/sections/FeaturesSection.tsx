@@ -9,7 +9,7 @@ export default function FeaturesSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-200">
         {/* AI Detection (Large) */}
-        <div className="md:col-span-2 md:row-span-1 bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden flex flex-col justify-end group">
+        <div className="md:col-span-2 md:row-span-1 bg-surface-container-lowest border border-outline-variant/30 hover:border-primary/20 hover:shadow-xl transition-all duration-300 p-10 rounded-3xl relative overflow-hidden flex flex-col justify-end group">
           <Image
             className="object-cover opacity-20 group-hover:scale-105 transition-transform duration-700"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa6Nhk5YKiAbraIRDicAgURthCuziSY45oIexeu3bfwgWb6EZQ6kvQ2hAP5nhkTdVx7fHbpriyFFfIVsAcMeg_WlKj9_p_A6uePftGAsVbXfLN6ybHqtiDpW_HdEYG6gHUwsyk0ZOaKTDbdFWXytVyctP_PPcWL6CiWEVMMryCZ7McbNRitIAvYxKZnDJqeYcf-r60Oc8b0g2fwemnrUhET72lcuw3rgZ_T_dTXkKjFvmMAJapGHY4FahLy-O6-6A4euAsvprg7A"
@@ -75,29 +75,36 @@ export default function FeaturesSection() {
           </div>
         </div>
 
-        {/* Smart Location */}
-        <div className="md:col-span-2 md:row-span-1 bg-secondary-container p-10 rounded-xl flex items-center gap-8 group overflow-hidden">
-          <div className="flex-1">
-            <h4 className="!text-3xl font-bold font-headline text-on-secondary-container mb-4">
-              Smart Location
-            </h4>
-            <p className="text-on-secondary-container/80 mb-6">
-              Find the nearest EcoBottle machine with real-time capacity
-              updates.
-            </p>
-            <button className="bg-on-secondary-container text-white px-6 py-2 rounded-full font-semibold">
-              Open Map
-            </button>
-          </div>
-          <div className="hidden lg:block w-48 h-48 bg-white/50 backdrop-blur-sm rounded-full shrink-0 shadow-lg p-2">
-            <div className="w-full h-full rounded-full overflow-hidden relative">
-              <Image
-                className="object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnVHn93_w9yhYNbL5R9h_2ibEVUxpln6kbgrbzkgWNuu7fUHAhmGDDNcRhpg1Ibx9fBbvIoLqA6L7PiUDTJ7f7Ukn-TUxZUz5tT8TaMwtssNHEOvNBD4mIDzbmS9sDtE2CeYepNWLc8txaITzjacle2nR1RAA7KTbkavIkyB1o3lwLcCj4wJeVZA9WkHKkv0JvNVYZrlYT33S9H7H8-24gf9kyZu5M3gSA0qkrTeKlP_PwpXlE7I3ZSisKdL_y-TObat3iXJRIzw"
-                alt="Minimalist city map view with green location pin indicators"
-                fill
-                sizes="192px"
-              />
+        {/* Anti-Fraud Validation */}
+        <div className="md:col-span-2 md:row-span-1 bg-linear-to-br from-on-primary-container to-primary text-on-primary p-10 rounded-xl relative overflow-hidden flex flex-col justify-center">
+          {/* Decorative blurs matching exactly the app's new visual identity */}
+          <div className="absolute -top-16 -right-16 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-surface-container-lowest/15 rounded-full blur-2xl pointer-events-none" />
+          
+          <div className="relative z-10 flex items-center gap-8">
+            <div className="flex-1">
+              <h4 className="!text-3xl font-bold font-headline mb-4 tracking-tight">
+                Anti-Fraud Barcode Scanner
+              </h4>
+              <p className="text-on-primary/90 mb-6 font-medium leading-relaxed">
+                Pencegahan kecurangan secara cerdas. Sistem kami memvalidasi standar barcode EAN untuk memastikan botol plastik belum pernah diklaim sebelumnya.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <div className="bg-surface-container-lowest/15 backdrop-blur-sm px-4 py-2 rounded-full border border-on-primary/10 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">verified_user</span>
+                  <span className="text-sm font-bold">100% Valid</span>
+                </div>
+                <div className="bg-surface-container-lowest/15 backdrop-blur-sm px-4 py-2 rounded-full border border-on-primary/10 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">qr_code_scanner</span>
+                  <span className="text-sm font-bold">Live EAN Support</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="hidden lg:flex w-40 h-40 bg-surface-container-lowest/15 backdrop-blur-md rounded-3xl shrink-0 shadow-2xl border border-on-primary/15 items-center justify-center p-6 transition-transform hover:scale-105 duration-500 group-hover:scale-105">
+               <span className="material-symbols-outlined !text-[80px] drop-shadow-md text-on-primary" style={{ fontVariationSettings: '"FILL" 1' }}>
+                 barcode_scanner
+               </span>
             </div>
           </div>
         </div>
