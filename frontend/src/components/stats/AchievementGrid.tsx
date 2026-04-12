@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { statsApi } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 
 interface Achievement {
   id: string;
@@ -43,16 +44,18 @@ export default function AchievementGrid() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {ALL_ACHIEVEMENTS.map((ach) => {
           const unlocked = earnedTitles.has(ach.title);
+          const titleKey = `ach_${ach.title.toLowerCase().replace(/ /g, "_")}` as TranslationKey;
+          const descKey = `ach_${ach.title.toLowerCase().replace(/ /g, "_")}_desc` as TranslationKey;
           return (
             <div key={ach.title} className={`p-4 rounded-xl text-center transition-all ${unlocked ? "bg-secondary-container/50 border border-primary/10" : "bg-surface-container opacity-50"}`}>
               <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center ${unlocked ? "bg-primary text-on-primary shadow-md shadow-primary/20" : "bg-surface-container-high text-outline"}`}>
                 <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: unlocked ? '"FILL" 1' : '"FILL" 0' }}>{unlocked ? ach.icon : "lock"}</span>
               </div>
               <p className={`text-xs font-bold ${unlocked ? "text-on-surface" : "text-tertiary"}`}>
-                {t(`ach_${ach.title.toLowerCase().replace(/ /g, "_")}`) || ach.title}
+                {t(titleKey) || ach.title}
               </p>
               <p className="text-tertiary text-[10px] mt-1">
-                {t(`ach_${ach.title.toLowerCase().replace(/ /g, "_")}_desc`) || ach.description}
+                {t(descKey) || ach.description}
               </p>
             </div>
           );
