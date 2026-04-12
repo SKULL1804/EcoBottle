@@ -3,7 +3,6 @@ EcoBottle — Scanner Service
 Core AI scanning business logic.
 """
 
-import os
 import uuid
 from decimal import Decimal
 from pathlib import Path
@@ -18,6 +17,7 @@ from app.models.transaction import Transaction
 from app.schemas.scanner import DetectedBottle, ScanResponse, ScanConfirmResponse
 from app.utils.vision_client import analyze_bottle_image
 from app.services.pricing_service import get_price_for_bottle, calculate_points
+from app.services.openfoodfacts_service import lookup_product_by_openfoodfacts
 from app.services.gamification_service import process_gamification
 from app.models.scanned_barcode import ScannedBarcode
 from datetime import date
@@ -85,8 +85,28 @@ async def process_scan(
 
     image_url = f"/uploads/{file_name}"
 
-    # 3. Analyze with YOLOv8 (local model)
-    ai_result = await analyze_bottle_image(image_data, file.content_type)
+    # 3. Lookup by barcode first (if available), then fallback to AI model
+    ai_result: dict = {"bottles": [], "image_quality": "good", "source": "ai"}
+    lookup_result = None
+    if barcode and settings.OPENFOODFACTS_ENABLED:
+        lookup_result = await lookup_product_by_openfoodfacts(barcode)
+
+    if lookup_result:
+        ai_result = {
+            "bottles": [{
+                "brand": lookup_result["brand"],
+                "type": lookup_result["type"],
+                "volume_estimate": lookup_result["volume_estimate"],
+                "quantity": lookup_result["quantity"],
+                "confidence": lookup_result["confidence"],
+            }],
+            "image_quality": lookup_result["image_quality"],
+            "source": lookup_result["source"],
+            "lookup": lookup_result.get("lookup"),
+        }
+    else:
+        ai_result = await analyze_bottle_image(image_data, file.content_type)
+        ai_result["source"] = "ai"
 
     # 4. Match prices and build response
     detected_bottles = []

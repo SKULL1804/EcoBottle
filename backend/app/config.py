@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
 
+    # OpenFoodFacts (open-source public API)
+    OPENFOODFACTS_ENABLED: bool = True
+
     # File Upload
     UPLOAD_DIR: str = "./uploads"
 

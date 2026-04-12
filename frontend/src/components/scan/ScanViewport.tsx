@@ -11,7 +11,8 @@ interface BBox { x1: number; y1: number; x2: number; y2: number; }
 interface Detection { bbox: BBox; class: string; label: string; type: string; confidence: number; }
 interface PreviewResult { detections: Detection[]; total_items: number; }
 interface AnalyzeResult { scan_id: string; detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[]; total_items: number; total_value: number; barcode?: string; }
-interface ConfirmResult { message: string; balance_added: number; points_earned: number; new_balance: number; new_points: number; gamification?: { level: number; level_title: string; new_achievements: { title: string; icon: string; description: string }[]; level_up: boolean; }; }
+interface ConfirmResult { message: string; amount_credited: number; points_earned: number; new_balance: number; new_points: number; gamification?: { level: number; level_title: string; new_achievements: { title: string; icon: string; description: string }[]; level_up: boolean; }; }
+interface CameraDeviceOption { id: string; label: string; }
 
 export default function ScanViewport() {
   const { refreshUser } = useAuth();
@@ -23,6 +24,9 @@ export default function ScanViewport() {
   const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
   const [error, setError] = useState("");
   const [statusText, setStatusText] = useState("");
+  const [bottleScore, setBottleScore] = useState(0);
+  const [cameraDevices, setCameraDevices] = useState<CameraDeviceOption[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>("");
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,16 +35,142 @@ export default function ScanViewport() {
   const lastFrameRef = useRef<Blob | null>(null);
   const barcodeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
   const barcodeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const barcodeBusyRef = useRef(false);
+  const previewErrorCountRef = useRef(0);
+  const previewBusyRef = useRef(false);
+  const cocoModelRef = useRef<{ detect: (input: HTMLVideoElement, maxNumBoxes?: number, minScore?: number) => Promise<Array<{ class: string; score: number }>> } | null>(null);
+  const cocoAnimationRef = useRef<number | null>(null);
+  const cocoLastTickRef = useRef(0);
+  const cocoMissCountRef = useRef(0);
+  const cocoBusyRef = useRef(false);
+  const lastLiveDetectionsRef = useRef<Detection[]>([]);
+  const bottleScoreRef = useRef(0);
+  const bottleDetectedRef = useRef(false);
+  const barcodeResultRef = useRef<string | null>(null);
+
+  const BOTTLE_ON_THRESHOLD = 42;
+  const BOTTLE_OFF_THRESHOLD = 16;
+  const SCORE_UP = 20;
+  const SCORE_DOWN_NORMAL = 8;
+  const SCORE_DOWN_BARCODE_PHASE = 3;
+
+  const applyBottleScore = useCallback((nextScore: number) => {
+    const clamped = Math.max(0, Math.min(100, nextScore));
+    bottleScoreRef.current = clamped;
+    setBottleScore((prev) => (Math.abs(prev - clamped) >= 1 ? clamped : prev));
+
+    const previousDetected = bottleDetectedRef.current;
+    let nextDetected = previousDetected;
+
+    if (clamped >= BOTTLE_ON_THRESHOLD) nextDetected = true;
+    else if (clamped <= BOTTLE_OFF_THRESHOLD) nextDetected = false;
+
+    if (nextDetected !== previousDetected) {
+      bottleDetectedRef.current = nextDetected;
+      setBottleDetected(nextDetected);
+    }
+  }, []);
+
+  const stopCocoDetector = useCallback(() => {
+    if (cocoAnimationRef.current !== null) {
+      cancelAnimationFrame(cocoAnimationRef.current);
+      cocoAnimationRef.current = null;
+    }
+    cocoLastTickRef.current = 0;
+    cocoMissCountRef.current = 0;
+    cocoBusyRef.current = false;
+  }, []);
+
+  const loadCocoModel = useCallback(async () => {
+    if (cocoModelRef.current) return cocoModelRef.current;
+    await import("@tensorflow/tfjs");
+    const cocoSsd = await import("@tensorflow-models/coco-ssd");
+    cocoModelRef.current = await cocoSsd.load({ base: "lite_mobilenet_v2" });
+    return cocoModelRef.current;
+  }, []);
+
+  const stopBarcodeScanner = useCallback(() => {
+    if (barcodeIntervalRef.current) {
+      clearInterval(barcodeIntervalRef.current);
+      barcodeIntervalRef.current = null;
+    }
+    barcodeReaderRef.current?.reset();
+    barcodeReaderRef.current = null;
+    barcodeBusyRef.current = false;
+  }, []);
+
+  const normalizeBarcode = useCallback((raw: string): string | null => {
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length === 13 || digits.length === 8) return digits;
+    if (digits.length === 12) return `0${digits}`;
+    return null;
+  }, []);
+
+  const listVideoDevices = useCallback(async (): Promise<CameraDeviceOption[]> => {
+    if (!navigator?.mediaDevices?.enumerateDevices) return [];
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices
+      .filter((device) => device.kind === "videoinput")
+      .map((device, index) => ({
+        id: device.deviceId,
+        label: device.label || `Camera ${index + 1}`,
+      }));
+  }, []);
+
+  const getPreferredCameraId = useCallback((devices: CameraDeviceOption[]): string => {
+    const rankedKeywords = ["droidcam", "iriun", "ivcam", "epoccam", "usb", "external", "rear", "back"];
+    const lowercased = devices.map((device) => ({
+      ...device,
+      lowerLabel: device.label.toLowerCase(),
+    }));
+
+    for (const keyword of rankedKeywords) {
+      const matched = lowercased.find((device) => device.lowerLabel.includes(keyword));
+      if (matched) return matched.id;
+    }
+
+    const avoidKeywords = ["facetime", "integrated", "builtin", "front"];
+    const nonIntegrated = lowercased.find(
+      (device) => !avoidKeywords.some((keyword) => device.lowerLabel.includes(keyword)),
+    );
+    return nonIntegrated?.id || devices[0]?.id || "";
+  }, []);
 
   const startCamera = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      if (videoRef.current) videoRef.current.srcObject = null;
+
+      const baseConstraints: MediaTrackConstraints = selectedCameraId
+        ? { deviceId: { exact: selectedCameraId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        : { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } };
+
+      let stream = await navigator.mediaDevices.getUserMedia({ video: baseConstraints });
+
+      const devices = await listVideoDevices();
+      setCameraDevices(devices);
+
+      if (!selectedCameraId && devices.length > 1) {
+        const preferredId = getPreferredCameraId(devices);
+        const currentTrack = stream.getVideoTracks()[0];
+        const currentDeviceId = currentTrack?.getSettings()?.deviceId || "";
+
+        if (preferredId && preferredId !== currentDeviceId) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: preferredId }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          });
+          setSelectedCameraId(preferredId);
+        }
+      }
+
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
-    } catch { setError("Gagal mengakses kamera. Pastikan izin kamera diberikan."); }
-  }, []);
+    } catch {
+      setError("Gagal mengakses kamera. Pastikan izin kamera diberikan dan kamera yang dipilih tersedia.");
+    }
+  }, [getPreferredCameraId, listVideoDevices, selectedCameraId]);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop());
@@ -49,12 +179,35 @@ export default function ScanViewport() {
   }, []);
 
   useEffect(() => {
+    bottleDetectedRef.current = bottleDetected;
+  }, [bottleDetected]);
+
+  useEffect(() => {
+    barcodeResultRef.current = barcodeResult;
+  }, [barcodeResult]);
+
+  useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (barcodeIntervalRef.current) clearInterval(barcodeIntervalRef.current);
+      stopCocoDetector();
+      stopBarcodeScanner();
       stopCamera();
     };
-  }, [stopCamera]);
+  }, [stopCamera, stopBarcodeScanner, stopCocoDetector]);
+
+  useEffect(() => {
+    const refreshDevices = async () => {
+      const devices = await listVideoDevices();
+      setCameraDevices(devices);
+      if (!selectedCameraId && devices.length > 0) {
+        setSelectedCameraId(getPreferredCameraId(devices));
+      }
+    };
+
+    refreshDevices();
+    navigator.mediaDevices?.addEventListener?.("devicechange", refreshDevices);
+    return () => navigator.mediaDevices?.removeEventListener?.("devicechange", refreshDevices);
+  }, [getPreferredCameraId, listVideoDevices, selectedCameraId]);
 
   const drawBoxes = useCallback((dets: Detection[]) => {
     const canvas = canvasRef.current;
@@ -83,55 +236,238 @@ export default function ScanViewport() {
     }
   }, []);
 
-  const captureFrame = useCallback((): Promise<Blob | null> => {
+  const captureFrame = useCallback((options?: { maxWidth?: number; quality?: number }): Promise<Blob | null> => {
     return new Promise(resolve => {
       const video = videoRef.current;
       if (!video || !video.videoWidth) { resolve(null); return; }
+
+      const maxWidth = options?.maxWidth;
+      const quality = options?.quality ?? 0.8;
+      const sourceWidth = video.videoWidth;
+      const sourceHeight = video.videoHeight;
+      const scale = maxWidth && sourceWidth > maxWidth ? maxWidth / sourceWidth : 1;
+
       const c = document.createElement("canvas");
-      c.width = video.videoWidth; c.height = video.videoHeight;
+      c.width = Math.round(sourceWidth * scale);
+      c.height = Math.round(sourceHeight * scale);
       c.getContext("2d")!.drawImage(video, 0, 0);
-      c.toBlob(blob => resolve(blob), "image/jpeg", 0.8);
+      c.toBlob(blob => resolve(blob), "image/jpeg", quality);
     });
+  }, []);
+
+  const mapCocoToDetections = useCallback((
+    predictions: Array<{ bbox?: number[]; class: string; score: number }>,
+    videoWidth: number,
+    videoHeight: number,
+  ): Detection[] => {
+    const trackedClasses = new Set(["bottle", "cup", "wine glass"]);
+    const classToType: Record<string, string> = {
+      bottle: "PET_bottle",
+      cup: "plastic_cup",
+      "wine glass": "glass_bottle",
+    };
+
+    return predictions
+      .filter((prediction) => trackedClasses.has(prediction.class))
+      .map((prediction) => {
+        const [x = 0, y = 0, w = 0, h = 0] = prediction.bbox || [];
+        const x1 = Math.max(0, x / videoWidth);
+        const y1 = Math.max(0, y / videoHeight);
+        const x2 = Math.min(1, (x + w) / videoWidth);
+        const y2 = Math.min(1, (y + h) / videoHeight);
+
+        return {
+          bbox: { x1, y1, x2, y2 },
+          class: prediction.class,
+          label: prediction.class === "bottle" ? "Botol" : prediction.class === "cup" ? "Gelas/ Cup" : "Botol Kaca",
+          type: classToType[prediction.class] || "PET_bottle",
+          confidence: Number(prediction.score.toFixed(2)),
+        };
+      })
+      .filter((item) => item.confidence >= 0.35);
   }, []);
 
   // --- Barcode scanning (client-side ZXing) ---
   const startBarcodeScanner = useCallback(() => {
+    if (barcodeResult || barcodeReaderRef.current) return;
+
     const hints = new Map();
     hints.set(DecodeHintType.POSSIBLE_FORMATS, [
-      BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.CODE_128,
+      BarcodeFormat.EAN_13,
+      BarcodeFormat.EAN_8,
+      BarcodeFormat.UPC_A,
+      BarcodeFormat.UPC_E,
     ]);
+    hints.set(DecodeHintType.TRY_HARDER, true);
     const reader = new BrowserMultiFormatReader(hints);
     barcodeReaderRef.current = reader;
 
-    // decodeOnceFromStream continuously scans frames until a barcode is found, then resolves
-    (async () => {
-      if (!streamRef.current || !videoRef.current) return;
-      try {
-        const result = await reader.decodeOnceFromStream(streamRef.current, videoRef.current);
-        if (result) setBarcodeResult(result.getText());
-      } catch {
-        // Cancelled via reset() or error — expected during cleanup
+    const video = videoRef.current;
+    if (!video) return;
+
+    const commitBarcode = (value: string | undefined) => {
+      if (!value || barcodeResult) return;
+      const normalized = normalizeBarcode(value.trim());
+      if (!normalized) return;
+      setBarcodeResult(normalized);
+      stopBarcodeScanner();
+    };
+
+    reader.decodeFromVideoElementContinuously(video, (result, decodeError) => {
+      if (result) {
+        commitBarcode(result.getText());
+        return;
       }
-    })();
-  }, []);
+      if (decodeError && !(decodeError instanceof NotFoundException)) {
+        // keep scanning for transient decode errors
+      }
+    }).catch(() => {
+      const scanOnce = async () => {
+        if (
+          !videoRef.current ||
+          videoRef.current.readyState < 2 ||
+          barcodeResult ||
+          barcodeBusyRef.current
+        ) return;
+
+        barcodeBusyRef.current = true;
+        try {
+          const result = await reader.decodeFromVideoElement(videoRef.current);
+          if (result) commitBarcode(result.getText());
+        } catch (err) {
+          if (!(err instanceof NotFoundException)) {
+            // ignore scanner transient errors, keep retrying
+          }
+        } finally {
+          barcodeBusyRef.current = false;
+        }
+      };
+
+      scanOnce();
+      barcodeIntervalRef.current = setInterval(scanOnce, 900);
+    });
+  }, [barcodeResult, normalizeBarcode, stopBarcodeScanner]);
+
+  useEffect(() => {
+    if (state !== "SCANNING" || barcodeResult || barcodeReaderRef.current) return;
+    startBarcodeScanner();
+  }, [state, barcodeResult, startBarcodeScanner]);
 
   // --- YOLO preview ---
   const previewOneFrame = useCallback(async () => {
-    const blob = await captureFrame();
-    if (!blob) return;
+    if (previewBusyRef.current) return;
+    previewBusyRef.current = true;
+
+    const blob = await captureFrame({ maxWidth: 640, quality: 0.62 });
+    if (!blob) {
+      previewBusyRef.current = false;
+      return;
+    }
     lastFrameRef.current = blob;
     try {
       const { status, data } = await scanApi.preview(blob);
-      if (status !== 200) return;
-      const result = data as PreviewResult;
-      setDetections(result.detections);
-      drawBoxes(result.detections);
-      if (result.total_items > 0) {
-        setBottleDetected(true);
-        if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      if (status !== 200) {
+        previewErrorCountRef.current += 1;
+        return;
       }
-    } catch { /* retry next interval */ }
-  }, [captureFrame, drawBoxes]);
+      previewErrorCountRef.current = 0;
+      const result = data as PreviewResult;
+      if (!bottleDetectedRef.current && result.detections.length > 0 && lastLiveDetectionsRef.current.length === 0) {
+        setDetections(result.detections);
+        drawBoxes(result.detections);
+      }
+      if (result.total_items > 0) {
+        applyBottleScore(bottleScoreRef.current + 10);
+      }
+    } catch {
+      previewErrorCountRef.current += 1;
+      if (previewErrorCountRef.current >= 3) {
+        setError("AI scanner belum siap. Cek backend model/dependency lalu coba lagi.");
+      }
+    } finally {
+      previewBusyRef.current = false;
+    }
+  }, [applyBottleScore, captureFrame, drawBoxes]);
+
+  useEffect(() => {
+    if (state !== "SCANNING") {
+      stopCocoDetector();
+      return;
+    }
+
+    let active = true;
+
+    const tick = async (timestamp: number) => {
+      if (!active) return;
+
+      const video = videoRef.current;
+      if (!video || video.readyState < 2) {
+        cocoAnimationRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      if (cocoBusyRef.current || timestamp - cocoLastTickRef.current < 70) {
+        cocoAnimationRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
+      cocoBusyRef.current = true;
+      cocoLastTickRef.current = timestamp;
+      try {
+        const model = await loadCocoModel();
+        if (!active) return;
+        const predictions = await model.detect(video, 10, 0.32);
+        if (!active) return;
+
+        const liveDetections = mapCocoToDetections(
+          predictions,
+          video.videoWidth || 1,
+          video.videoHeight || 1,
+        );
+
+        const inBarcodePhase = bottleDetectedRef.current && !barcodeResultRef.current;
+
+        if (liveDetections.length > 0) {
+          cocoMissCountRef.current = 0;
+          lastLiveDetectionsRef.current = liveDetections;
+          setDetections(liveDetections);
+          drawBoxes(liveDetections);
+          applyBottleScore(bottleScoreRef.current + SCORE_UP);
+        } else {
+          cocoMissCountRef.current += 1;
+
+          if (cocoMissCountRef.current <= 3 && lastLiveDetectionsRef.current.length > 0) {
+            drawBoxes(lastLiveDetectionsRef.current);
+          } else {
+            lastLiveDetectionsRef.current = [];
+          }
+
+          const down = inBarcodePhase ? SCORE_DOWN_BARCODE_PHASE : SCORE_DOWN_NORMAL;
+          applyBottleScore(bottleScoreRef.current - down);
+        }
+      } catch {
+        // Keep scanner running even if local model fails
+      } finally {
+        cocoBusyRef.current = false;
+        if (active) {
+          cocoAnimationRef.current = requestAnimationFrame(tick);
+        }
+      }
+    };
+
+    cocoAnimationRef.current = requestAnimationFrame(tick);
+    return () => {
+      active = false;
+      stopCocoDetector();
+    };
+  }, [
+    applyBottleScore,
+    drawBoxes,
+    loadCocoModel,
+    mapCocoToDetections,
+    stopCocoDetector,
+    state,
+  ]);
 
   // --- Auto-transition to READY when both checks pass ---
   useEffect(() => {
@@ -140,27 +476,40 @@ export default function ScanViewport() {
       setStatusText(`✅ Botol terdeteksi • Barcode: ${barcodeResult}`);
     } else if (state === "SCANNING") {
       const parts: string[] = [];
-      parts.push(bottleDetected ? "🤖 AI ✅" : "🤖 AI scanning...");
+      parts.push(bottleDetected ? `🤖 Tracking stabil ${Math.round(bottleScore)}%` : `🤖 AI scanning... ${Math.round(bottleScore)}%`);
       parts.push(barcodeResult ? `📊 Barcode ✅` : "📊 Barcode scanning...");
+      if (bottleDetected && !barcodeResult) {
+        parts.push("🎯 Barcode priority mode");
+      }
       setStatusText(parts.join("  •  "));
     }
-  }, [bottleDetected, barcodeResult, state]);
+  }, [bottleDetected, barcodeResult, bottleScore, state]);
 
   const startScanning = useCallback(async () => {
     setError(""); setAnalyzeResult(null); setConfirmResult(null);
     setDetections([]); setBottleDetected(false); setBarcodeResult(null);
+    setBottleScore(0);
+    bottleScoreRef.current = 0;
+    bottleDetectedRef.current = false;
+    barcodeResultRef.current = null;
+    lastLiveDetectionsRef.current = [];
+    previewErrorCountRef.current = 0;
+    previewBusyRef.current = false;
+    barcodeBusyRef.current = false;
+    stopCocoDetector();
+    stopBarcodeScanner();
     setState("SCANNING"); await startCamera();
     setStatusText("🔍 Memulai deteksi...");
     setTimeout(() => {
       previewOneFrame();
-      intervalRef.current = setInterval(previewOneFrame, 3000);
-      startBarcodeScanner();
+      intervalRef.current = setInterval(previewOneFrame, 1200);
     }, 1000);
-  }, [startCamera, previewOneFrame, startBarcodeScanner]);
+  }, [startCamera, previewOneFrame, stopBarcodeScanner, stopCocoDetector]);
 
   const handleConfirm = async () => {
     setState("CONFIRMING"); setStatusText("📦 Menyetorkan botol...");
-    const blob = lastFrameRef.current || await captureFrame();
+    const liveFrame = await captureFrame({ maxWidth: 1280, quality: 0.85 });
+    const blob = liveFrame || lastFrameRef.current;
     if (!blob) { setError("Gagal menangkap frame"); setState("READY"); return; }
     try {
       const { status: aS, data: aD } = await scanApi.analyze(blob, barcodeResult || undefined);
@@ -179,16 +528,30 @@ export default function ScanViewport() {
   const scanAgain = () => {
     setDetections([]); setAnalyzeResult(null); setConfirmResult(null);
     setError(""); setBottleDetected(false); setBarcodeResult(null);
+    setBottleScore(0);
+    bottleScoreRef.current = 0;
+    bottleDetectedRef.current = false;
+    barcodeResultRef.current = null;
+    lastLiveDetectionsRef.current = [];
+    previewBusyRef.current = false;
+    stopCocoDetector();
     stopCamera(); setState("IDLE");
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    if (barcodeIntervalRef.current) { clearInterval(barcodeIntervalRef.current); barcodeIntervalRef.current = null; }
+    stopBarcodeScanner();
     if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
   const stopScanning = () => {
+    previewBusyRef.current = false;
+    stopCocoDetector();
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    if (barcodeIntervalRef.current) { clearInterval(barcodeIntervalRef.current); barcodeIntervalRef.current = null; }
+    stopBarcodeScanner();
     stopCamera(); setDetections([]); setBottleDetected(false); setBarcodeResult(null);
+    setBottleScore(0);
+    bottleScoreRef.current = 0;
+    bottleDetectedRef.current = false;
+    barcodeResultRef.current = null;
+    lastLiveDetectionsRef.current = [];
     setState("IDLE"); setStatusText("");
     if (canvasRef.current) canvasRef.current.getContext("2d")?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
@@ -241,10 +604,25 @@ export default function ScanViewport() {
         )}
 
         {state === "IDLE" && (
-          <button onClick={startScanning} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>center_focus_strong</span>
-            Mulai Scan
-          </button>
+          <div className="flex flex-col gap-3">
+            <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/20">
+              <label className="block text-xs font-semibold text-tertiary mb-2">Kamera Aktif</label>
+              <select
+                value={selectedCameraId}
+                onChange={(event) => setSelectedCameraId(event.target.value)}
+                className="w-full rounded-lg bg-surface-container-high px-3 py-2 text-sm text-on-surface outline-none"
+              >
+                {cameraDevices.length === 0 && <option value="">Default Camera</option>}
+                {cameraDevices.map((camera) => (
+                  <option key={camera.id} value={camera.id}>{camera.label}</option>
+                ))}
+              </select>
+            </div>
+            <button onClick={startScanning} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>center_focus_strong</span>
+              Mulai Scan
+            </button>
+          </div>
         )}
         {state === "SCANNING" && (
           <button onClick={stopScanning} className="w-full py-5 rounded-2xl font-bold text-lg bg-error text-on-error shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
@@ -310,7 +688,7 @@ export default function ScanViewport() {
             <div className="space-y-3">
               <div className="flex justify-between items-center p-4 bg-secondary-container rounded-xl">
                 <span className="text-on-secondary-container text-sm font-medium">Saldo Ditambahkan</span>
-                <span className="font-black text-primary text-xl font-headline">+Rp{(confirmResult.balance_added ?? 0).toLocaleString("id")}</span>
+                <span className="font-black text-primary text-xl font-headline">+Rp{(confirmResult.amount_credited ?? 0).toLocaleString("id")}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
                 <span className="text-tertiary text-sm">Poin</span>

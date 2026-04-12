@@ -1,0 +1,25 @@
+# Python envs & caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local runtime artifacts
+uploads/
+ecobottle.db
+*.sqlite
+*.sqlite3
+
+# VCS & tooling
+.git/
+.gitignore
+.pytest_cache/
+.mypy_cache/
+
+# Editor/system files
+.DS_Store
+*.log
+
+# Keep secrets out of build context
+.env
+.env.*

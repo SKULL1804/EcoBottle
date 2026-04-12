@@ -10,7 +10,6 @@ Detectable classes:
 
 import io
 import gc
-from pathlib import Path
 from PIL import Image
 from ultralytics import YOLO
 
@@ -56,13 +55,18 @@ def _load_model() -> YOLO:
     global _model
     if _model is None:
         print("🤖 Loading YOLOv8 waste detection model...")
-        from huggingface_hub import hf_hub_download
-        model_path = hf_hub_download(
-            repo_id="kendrickfff/waste-classification-yolov8-ken",
-            filename="yolov8n-waste-12cls-best.pt",
-        )
-        _model = YOLO(model_path)
-        print("✅ Model loaded successfully!")
+        try:
+            from huggingface_hub import hf_hub_download
+            model_path = hf_hub_download(
+                repo_id="kendrickfff/waste-classification-yolov8-ken",
+                filename="yolov8n-waste-12cls-best.pt",
+            )
+            _model = YOLO(model_path)
+            print("✅ Model loaded successfully!")
+        except Exception as exc:
+            raise RuntimeError(
+                "Model YOLOv8 gagal dimuat. Pastikan dependency terpasang dan server bisa mengakses HuggingFace untuk download model pertama kali."
+            ) from exc
     return _model
 
 
@@ -78,13 +82,19 @@ async def analyze_bottle_image(image_data: bytes, mime_type: str = "image/jpeg")
         Dict with detected bottles in EcoBottle format
     """
     # Load image from bytes
-    image = Image.open(io.BytesIO(image_data))
+    try:
+        image = Image.open(io.BytesIO(image_data))
+    except Exception as exc:
+        raise RuntimeError("File gambar tidak valid atau rusak") from exc
 
     # Load model
     model = _load_model()
 
     # Run inference (batch=1, optimized for low RAM)
-    results = model(image, conf=0.55, imgsz=640, verbose=False)
+    try:
+        results = model(image, conf=0.55, imgsz=640, verbose=False)
+    except Exception as exc:
+        raise RuntimeError("Inferensi model gagal dijalankan") from exc
 
     # Parse detections
     bottles = []
@@ -148,11 +158,17 @@ async def analyze_bottle_preview(image_data: bytes) -> dict:
     Returns:
         Dict with list of bounding boxes and summary
     """
-    image = Image.open(io.BytesIO(image_data))
+    try:
+        image = Image.open(io.BytesIO(image_data))
+    except Exception as exc:
+        raise RuntimeError("Frame preview tidak valid") from exc
     img_w, img_h = image.size
 
     model = _load_model()
-    results = model(image, conf=0.65, imgsz=640, verbose=False)
+    try:
+        results = model(image, conf=0.65, imgsz=640, verbose=False)
+    except Exception as exc:
+        raise RuntimeError("Inferensi model preview gagal dijalankan") from exc
 
     # Minimum bbox area threshold (relative) to reject tiny/noise detections
     MIN_BBOX_AREA = 0.005  # at least 0.5% of image area

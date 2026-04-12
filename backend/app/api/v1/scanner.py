@@ -3,6 +3,8 @@ EcoBottle — Scanner API Routes
 POST /analyze, POST /{id}/confirm, GET /history
 """
 
+import logging
+
 from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
@@ -22,6 +24,7 @@ from app.services.scanner_service import process_scan, confirm_scan
 from app.utils.vision_client import analyze_bottle_preview
 
 router = APIRouter(prefix="/scan", tags=["Scanner ⭐"])
+logger = logging.getLogger(__name__)
 
 PREVIEW_ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 PREVIEW_MAX_SIZE = 5 * 1024 * 1024  # 5MB for preview (lighter)
@@ -37,14 +40,29 @@ async def preview_scan(
     TIDAK menyimpan gambar ke disk, TIDAK membuat scan_log.
     Digunakan untuk overlay bounding box di kamera frontend.
     """
-    from fastapi import HTTPException, status as http_status
+    from fastapi import HTTPException
     if file.content_type not in PREVIEW_ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="Format tidak didukung")
     image_data = await file.read()
     if len(image_data) > PREVIEW_MAX_SIZE:
         raise HTTPException(status_code=400, detail="File terlalu besar untuk preview")
-    result = await analyze_bottle_preview(image_data)
-    return result
+    try:
+        result = await analyze_bottle_preview(image_data)
+        return result
+    except HTTPException:
+        raise
+    except RuntimeError as exc:
+        logger.exception("Scanner preview unavailable")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Layanan AI scanner belum siap: {exc}",
+        ) from exc
+    except Exception as exc:
+        logger.exception("Scanner preview failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Gagal memproses preview scanner",
+        ) from exc
 
 
 @router.post("/analyze", response_model=ScanResponse)
@@ -63,7 +81,23 @@ async def analyze_scan(
     3. Hasil scan berstatus 'pending' — user harus konfirmasi
     4. Setelah dikonfirmasi, saldo & poin ditambahkan
     """
-    return await process_scan(db, current_user, file, barcode=barcode)
+    from fastapi import HTTPException
+    try:
+        return await process_scan(db, current_user, file, barcode=barcode)
+    except HTTPException:
+        raise
+    except RuntimeError as exc:
+        logger.exception("Scanner analyze unavailable")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Layanan AI scanner belum siap: {exc}",
+        ) from exc
+    except Exception as exc:
+        logger.exception("Scanner analyze failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Gagal memproses analisis scanner",
+        ) from exc
 
 
 @router.post("/{scan_id}/confirm", response_model=ScanConfirmResponse)
