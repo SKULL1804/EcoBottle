@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function WalletCard() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const balance = user?.balance || 0;
 
   return (
@@ -16,9 +18,9 @@ export default function WalletCard() {
           <div className="p-3 bg-secondary-container rounded-2xl flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-3xl">account_balance_wallet</span>
           </div>
-          <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold font-headline tracking-wide">ACTIVE WALLET</span>
+          <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold font-headline tracking-wide">{t("active_wallet")}</span>
         </div>
-        <p className="text-tertiary text-sm font-medium mb-1">Available Balance</p>
+        <p className="text-tertiary text-sm font-medium mb-1">{t("available_balance")}</p>
         <h3 className="text-5xl font-black text-on-surface mb-8 tracking-tighter font-headline">
           Rp {Number(balance).toLocaleString("id")}
         </h3>
@@ -26,10 +28,10 @@ export default function WalletCard() {
 
       <div className="flex gap-3 relative z-10">
         <Link href="/dashboard/wallet" className="flex-1 py-4 gradient-primary text-on-primary font-bold rounded-full text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-200 text-center">
-          Withdraw
+          {t("withdraw")}
         </Link>
         <Link href="/dashboard/history" className="px-6 py-4 bg-surface-container-high text-on-surface font-bold rounded-full text-sm hover:bg-surface-container-highest transition-colors text-center">
-          History
+          {t("history")}
         </Link>
       </div>
     </section>

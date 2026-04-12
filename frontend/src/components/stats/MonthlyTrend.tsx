@@ -1,6 +1,10 @@
+"use client";
+
 import { MONTHLY_TREND } from "@/constants/stats";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MonthlyTrend() {
+  const { t } = useLanguage();
   const maxBottles = Math.max(...MONTHLY_TREND.map((d) => d.bottles));
 
   return (
@@ -8,9 +12,9 @@ export default function MonthlyTrend() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h4 className="font-bold text-on-surface font-headline">
-            Tren Bulanan
+            {t("monthly_trend") || "Tren Bulanan"}
           </h4>
-          <p className="text-tertiary text-xs mt-0.5">6 bulan terakhir</p>
+          <p className="text-tertiary text-xs mt-0.5">{t("last_6_months") || "6 bulan terakhir"}</p>
         </div>
         <span className="text-primary text-xs font-bold bg-primary/10 px-2.5 py-1 rounded-full">
           +67%

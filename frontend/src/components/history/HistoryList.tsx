@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { txApi } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Transaction {
   id: string;
@@ -13,16 +14,11 @@ interface Transaction {
   created_at: string;
 }
 
-const FILTERS = [
-  { label: "Semua", value: "all", icon: "list" },
-  { label: "Daur Ulang", value: "deposit", icon: "recycling" },
-  { label: "Withdraw", value: "withdrawal", icon: "send" },
-];
-
 export default function HistoryList() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, lang } = useLanguage();
 
   useEffect(() => {
     txApi.list(0, 50).then(({ status, data }) => {
@@ -30,12 +26,24 @@ export default function HistoryList() {
     }).catch(() => { }).finally(() => setLoading(false));
   }, []);
 
+  const FILTERS = [
+    { label: t("filter_all"), value: "all", icon: "list" },
+    { label: t("filter_recycle"), value: "deposit", icon: "recycling" },
+    { label: t("filter_withdraw"), value: "withdrawal", icon: "send" },
+  ];
+
   const filtered = activeFilter === "all" ? transactions : transactions.filter(t => t.type === activeFilter);
 
   const totalDeposit = transactions.filter(t => t.type === "deposit").reduce((s, t) => s + Number(t.amount), 0);
   const totalWithdraw = transactions.filter(t => t.type === "withdrawal").reduce((s, t) => s + Number(t.amount), 0);
 
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString("id", { day: "numeric", month: "short", year: "numeric" });
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(lang === "id" ? "id" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
   const formatRupiah = (val: number) => `Rp ${val.toLocaleString("id")}`;
 
   return (
@@ -50,23 +58,25 @@ export default function HistoryList() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm text-center">
-          <p className="text-tertiary text-[11px] font-medium">Pemasukan</p>
+          <p className="text-tertiary text-[11px] font-medium">{t("income")}</p>
           <p className="text-xl font-black text-primary font-headline">+{formatRupiah(totalDeposit)}</p>
         </div>
         <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm text-center">
-          <p className="text-tertiary text-[11px] font-medium">Withdraw</p>
+          <p className="text-tertiary text-[11px] font-medium">{t("expense")}</p>
           <p className="text-xl font-black text-error font-headline">-{formatRupiah(totalWithdraw)}</p>
         </div>
         <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm text-center">
-          <p className="text-tertiary text-[11px] font-medium">Total Transaksi</p>
+          <p className="text-tertiary text-[11px] font-medium">{t("total_transactions")}</p>
           <p className="text-xl font-black text-on-surface font-headline">{transactions.length}</p>
         </div>
       </div>
 
       <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
         <div className="flex justify-between items-center mb-6">
-          <h4 className="font-bold text-on-surface font-headline">{activeFilter === "all" ? "Semua Riwayat" : FILTERS.find(f => f.value === activeFilter)?.label ?? "Riwayat"}</h4>
-          <span className="text-tertiary text-xs font-medium">{filtered.length} transaksi</span>
+          <h4 className="font-bold text-on-surface font-headline">
+            {activeFilter === "all" ? t("all_history") : FILTERS.find(f => f.value === activeFilter)?.label ?? t("history")}
+          </h4>
+          <span className="text-tertiary text-xs font-medium">{filtered.length} {t("transactions")}</span>
         </div>
 
         {loading ? (
@@ -74,7 +84,7 @@ export default function HistoryList() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-outline text-5xl mb-4 block">inbox</span>
-            <p className="text-tertiary text-sm">Belum ada riwayat</p>
+            <p className="text-tertiary text-sm">{t("no_history")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -89,7 +99,7 @@ export default function HistoryList() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-on-surface text-sm truncate">
-                      {tx.type === "deposit" ? "Setoran Botol" : `Withdraw${tx.channel_code ? ` ke ${tx.channel_code}` : ""}`}
+                      {tx.type === "deposit" ? t("bottle_deposit") : `${t("withdraw_to")}${tx.channel_code ? ` ${tx.channel_code}` : ""}`}
                     </p>
                     <p className="text-tertiary text-[11px] truncate">{tx.points_earned > 0 ? `+${tx.points_earned} poin` : tx.status}</p>
                   </div>

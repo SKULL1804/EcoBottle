@@ -3,7 +3,7 @@ import ProfileCard from "@/components/profile/ProfileCard";
 import TierProgress from "@/components/profile/TierProgress";
 import QuickStats from "@/components/profile/QuickStats";
 import SettingsMenu from "@/components/profile/SettingsMenu";
-import Link from "next/link";
+import PageHeader from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Profil & Pengaturan — EcoBottle",
@@ -15,23 +15,11 @@ export default function ProfilePage() {
   return (
     <>
       {/* Header */}
-      <header className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="p-2.5 bg-surface-container-low rounded-full text-on-surface hover:bg-surface-container transition-colors flex items-center justify-center  "
-          >
-            <span className="material-symbols-outlined">arrow_back</span>
-          </Link>
-          <div>
-
-          <h2 className="text-3xl font-extrabold tracking-tight text-on-background font-headline">
-            Profil & Pengaturan
-          </h2>
-          <p className="text-tertiary">Kelola akun dan preferensi Anda</p>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        titleKey="profile_page_title"
+        descKey="profile_page_desc"
+        backHref="/dashboard"
+      />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

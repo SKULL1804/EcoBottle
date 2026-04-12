@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 const TIERS = [
   { name: "Pemula", icon: "shield", minBottles: 0, maxBottles: 10 },
@@ -12,9 +13,10 @@ const TIERS = [
 
 export default function TierProgress() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const totalScans = user?.total_scans || 0;
 
-  const currentIdx = TIERS.findIndex((t, i) => totalScans >= t.minBottles && (i === TIERS.length - 1 || totalScans < TIERS[i + 1].minBottles));
+  const currentIdx = TIERS.findIndex((tier, i) => totalScans >= tier.minBottles && (i === TIERS.length - 1 || totalScans < TIERS[i + 1].minBottles));
   const currentTier = TIERS[Math.max(0, currentIdx)];
   const nextTier = TIERS[currentIdx + 1];
 
@@ -24,18 +26,25 @@ export default function TierProgress() {
 
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-      <h4 className="font-bold text-on-surface font-headline mb-2">Tier Progression</h4>
-      <p className="text-tertiary text-xs mb-6">
-        {nextTier ? `${nextTier.minBottles - totalScans} botol lagi untuk ${nextTier.name}` : "Tier tertinggi tercapai! 🏆"}
-      </p>
+      <h4 className="font-bold text-on-surface font-headline mb-2">{t("tier_progression")}</h4>
+      <div className="text-tertiary text-xs mb-6 flex items-center">
+        {nextTier
+          ? `${nextTier.minBottles - totalScans} ${t("bottles_to_tier")} ${nextTier.name}`
+          : (
+            <span className="flex items-center gap-1.5 text-primary font-bold">
+              <span className="material-symbols-outlined text-sm">emoji_events</span>
+              {t("max_tier")}
+            </span>
+          )}
+      </div>
 
       <div className="relative mb-6">
         <div className="h-3 bg-surface-container rounded-full overflow-hidden">
           <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${progress}%`, background: "linear-gradient(to right, var(--color-primary), var(--color-primary-container))" }} />
         </div>
         <div className="flex justify-between mt-2">
-          <span className="text-[11px] text-tertiary font-medium">{totalScans} botol</span>
-          <span className="text-[11px] text-tertiary font-medium">{currentTier?.maxBottles} botol</span>
+          <span className="text-[11px] text-tertiary font-medium">{totalScans} {t("bottles_unit")}</span>
+          <span className="text-[11px] text-tertiary font-medium">{currentTier?.maxBottles} {t("bottles_unit")}</span>
         </div>
       </div>
 

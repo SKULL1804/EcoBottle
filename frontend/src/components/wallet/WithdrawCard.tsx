@@ -1,14 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { WITHDRAW_OPTIONS } from "@/constants/wallet";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function WithdrawCard() {
+  const { t } = useLanguage();
+
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <h4 className="font-bold text-on-surface font-headline mb-4">
-        Tarik Saldo
+        {t("withdraw_title")}
       </h4>
       <p className="text-tertiary text-xs mb-6">
-        Pilih metode penarikan yang tersedia
+        {t("withdraw_subtitle")}
       </p>
 
       <div className="space-y-3">
@@ -49,9 +54,8 @@ export default function WithdrawCard() {
         className="mt-4 w-full py-3 gradient-primary text-on-primary font-bold rounded-xl text-sm shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
       >
         <span className="material-symbols-outlined text-lg">send</span>
-        Tarik Saldo Sekarang
+        {t("withdraw_now")}
       </Link>
     </div>
   );
 }
-

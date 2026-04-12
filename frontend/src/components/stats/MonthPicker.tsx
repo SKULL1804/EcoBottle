@@ -1,38 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-
-const MONTH_NAMES = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
-
-const SHORT_MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Mei",
-  "Jun",
-  "Jul",
-  "Agu",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Des",
-];
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MonthPicker() {
+  const { t, lang } = useLanguage();
+  
+  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-US", { month: "long" }), [lang]);
+  const shortMonthFormatter = useMemo(() => new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-US", { month: "short" }), [lang]);
+
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth()); // 0-indexed
@@ -97,7 +73,7 @@ export default function MonthPicker() {
           calendar_month
         </span>
         <span className="text-on-secondary-container text-sm font-bold">
-          {MONTH_NAMES[month]} {year}
+          {monthFormatter.format(new Date(year, month, 1))} {year}
         </span>
         <span
           className={`material-symbols-outlined text-on-secondary-container/60 text-base transition-transform ${open ? "rotate-180" : ""}`}
@@ -141,7 +117,8 @@ export default function MonthPicker() {
 
           {/* Month Grid */}
           <div className="grid grid-cols-3 gap-1.5 p-3">
-            {SHORT_MONTHS.map((name, i) => {
+            {Array.from({ length: 12 }).map((_, i) => {
+              const name = shortMonthFormatter.format(new Date(year, i, 1));
               const isFuture =
                 year === now.getFullYear() && i > now.getMonth();
               const isSelected = i === month && year === year;
@@ -180,7 +157,7 @@ export default function MonthPicker() {
               }}
               className="flex-1 py-2 text-xs font-bold text-primary bg-primary/10 rounded-lg hover:bg-primary/15 transition-colors"
             >
-              Bulan Ini
+              {t("this_month") || "Bulan Ini"}
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { txApi } from "@/lib/api";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Transaction {
   id: string;
@@ -15,6 +16,7 @@ interface Transaction {
 
 export default function RecentActivity() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { t, lang } = useLanguage();
 
   useEffect(() => {
     txApi.list(0, 5).then(({ status, data }) => {
@@ -25,17 +27,22 @@ export default function RecentActivity() {
     }).catch(() => { });
   }, []);
 
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString("id", { day: "numeric", month: "short", year: "numeric" });
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(lang === "id" ? "id" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
   return (
     <section className="md:col-span-4 lg:col-span-6 bg-surface-container-lowest rounded-xl p-8 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-8">
-        <h4 className="text-xl font-bold font-headline">Aktivitas Terbaru</h4>
-        <Link href="/dashboard/history" className="text-primary text-sm font-bold hover:underline">Lihat Semua</Link>
+        <h4 className="text-xl font-bold font-headline">{t("recent_activity")}</h4>
+        <Link href="/dashboard/history" className="text-primary text-sm font-bold hover:underline">{t("view_all")}</Link>
       </div>
 
       {transactions.length === 0 ? (
-        <p className="text-tertiary text-sm text-center py-8">Belum ada aktivitas. Mulai scan botol!</p>
+        <p className="text-tertiary text-sm text-center py-8">{t("no_activity")}</p>
       ) : (
         <div className="space-y-4">
           {transactions.map((tx) => (
@@ -45,7 +52,7 @@ export default function RecentActivity() {
                   <span className="material-symbols-outlined">{tx.type === "deposit" ? "recycling" : "payments"}</span>
                 </div>
                 <div>
-                  <p className="font-bold text-on-surface">{tx.type === "deposit" ? "Setoran Botol" : "Penarikan Dana"}</p>
+                  <p className="font-bold text-on-surface">{tx.type === "deposit" ? t("bottle_deposit") : t("fund_withdrawal")}</p>
                   <p className="text-xs text-tertiary">{formatDate(tx.created_at)}</p>
                 </div>
               </div>

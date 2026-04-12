@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { scanApi } from "@/lib/api";
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType, NotFoundException } from "@zxing/library";
+import { useLanguage } from "@/context/LanguageContext";
 
 type ScanState = "IDLE" | "SCANNING" | "READY" | "CONFIRMING" | "CONFIRMED";
 
@@ -16,6 +17,7 @@ interface CameraDeviceOption { id: string; label: string; }
 
 export default function ScanViewport() {
   const { refreshUser } = useAuth();
+  const { t } = useLanguage();
   const [state, setState] = useState<ScanState>("IDLE");
   const [detections, setDetections] = useState<Detection[]>([]);
   const [bottleDetected, setBottleDetected] = useState(false);
@@ -23,7 +25,7 @@ export default function ScanViewport() {
   const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResult | null>(null);
   const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
   const [error, setError] = useState("");
-  const [statusText, setStatusText] = useState("");
+  const [statusText, setStatusText] = useState<React.ReactNode>("");
   const [bottleScore, setBottleScore] = useState(0);
   const [cameraDevices, setCameraDevices] = useState<CameraDeviceOption[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>("");
@@ -168,9 +170,9 @@ export default function ScanViewport() {
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
     } catch {
-      setError("Gagal mengakses kamera. Pastikan izin kamera diberikan dan kamera yang dipilih tersedia.");
+      setError(t("camera_error") || "Gagal mengakses kamera. Pastikan izin kamera diberikan dan kamera yang dipilih tersedia.");
     }
-  }, [getPreferredCameraId, listVideoDevices, selectedCameraId]);
+  }, [getPreferredCameraId, listVideoDevices, selectedCameraId, t]);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop());
@@ -279,13 +281,13 @@ export default function ScanViewport() {
         return {
           bbox: { x1, y1, x2, y2 },
           class: prediction.class,
-          label: prediction.class === "bottle" ? "Botol" : prediction.class === "cup" ? "Gelas/ Cup" : "Botol Kaca",
+          label: prediction.class === "bottle" ? (t("bottle_label") || "Botol") : prediction.class === "cup" ? (t("cup_label") || "Gelas/ Cup") : (t("glass_label") || "Botol Kaca"),
           type: classToType[prediction.class] || "PET_bottle",
           confidence: Number(prediction.score.toFixed(2)),
         };
       })
       .filter((item) => item.confidence >= 0.35);
-  }, []);
+  }, [t]);
 
   // --- Barcode scanning (client-side ZXing) ---
   const startBarcodeScanner = useCallback(() => {
@@ -382,7 +384,7 @@ export default function ScanViewport() {
     } catch {
       previewErrorCountRef.current += 1;
       if (previewErrorCountRef.current >= 3) {
-        setError("AI scanner belum siap. Cek backend model/dependency lalu coba lagi.");
+        setError(t("ai_not_ready") || "AI scanner belum siap. Cek backend model.");
       }
     } finally {
       previewBusyRef.current = false;
@@ -473,17 +475,40 @@ export default function ScanViewport() {
   useEffect(() => {
     if (state === "SCANNING" && bottleDetected && barcodeResult) {
       setState("READY");
-      setStatusText(`✅ Botol terdeteksi • Barcode: ${barcodeResult}`);
+      setStatusText(
+        <div className="flex items-center justify-center gap-1.5"><span className="material-symbols-outlined text-sm text-primary">check_circle</span> {t("bottle_detected")} • Barcode: {barcodeResult}</div>
+      );
     } else if (state === "SCANNING") {
-      const parts: string[] = [];
-      parts.push(bottleDetected ? `🤖 Tracking stabil ${Math.round(bottleScore)}%` : `🤖 AI scanning... ${Math.round(bottleScore)}%`);
-      parts.push(barcodeResult ? `📊 Barcode ✅` : "📊 Barcode scanning...");
+      const parts: React.ReactNode[] = [];
+      parts.push(
+        <div key="ai" className="flex items-center gap-1">
+          <span className="material-symbols-outlined text-sm">smart_toy</span>
+          {bottleDetected ? `${t("tracking_stable")} ${Math.round(bottleScore)}%` : `${t("ai_scanning")} ${Math.round(bottleScore)}%`}
+        </div>
+      );
+      parts.push(
+        <span key="dot1" className="opacity-50">•</span>
+      );
+      parts.push(
+        <div key="bc" className="flex items-center gap-1">
+          <span className="material-symbols-outlined text-sm">barcode_scanner</span>
+          {barcodeResult ? <><span className="material-symbols-outlined text-sm text-primary">check_circle</span></> : `${t("barcode_scanning")}`}
+        </div>
+      );
       if (bottleDetected && !barcodeResult) {
-        parts.push("🎯 Barcode priority mode");
+        parts.push(
+          <span key="dot2" className="opacity-50">•</span>
+        );
+        parts.push(
+          <div key="prio" className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">center_focus_strong</span>
+            {t("barcode_priority")}
+          </div>
+        );
       }
-      setStatusText(parts.join("  •  "));
+      setStatusText(<div className="flex items-center justify-center gap-2">{parts}</div>);
     }
-  }, [bottleDetected, barcodeResult, bottleScore, state]);
+  }, [bottleDetected, barcodeResult, bottleScore, state, t]);
 
   const startScanning = useCallback(async () => {
     setError(""); setAnalyzeResult(null); setConfirmResult(null);
@@ -499,7 +524,7 @@ export default function ScanViewport() {
     stopCocoDetector();
     stopBarcodeScanner();
     setState("SCANNING"); await startCamera();
-    setStatusText("🔍 Memulai deteksi...");
+    setStatusText(<div className="flex items-center justify-center gap-1.5"><span className="material-symbols-outlined text-sm">search</span> {t("start_detection")}</div>);
     setTimeout(() => {
       previewOneFrame();
       intervalRef.current = setInterval(previewOneFrame, 1200);
@@ -507,22 +532,22 @@ export default function ScanViewport() {
   }, [startCamera, previewOneFrame, stopBarcodeScanner, stopCocoDetector]);
 
   const handleConfirm = async () => {
-    setState("CONFIRMING"); setStatusText("📦 Menyetorkan botol...");
+    setState("CONFIRMING"); setStatusText(<div className="flex items-center justify-center gap-1.5"><span className="material-symbols-outlined text-sm">inventory_2</span> {t("submitting_bottle")}</div>);
     const liveFrame = await captureFrame({ maxWidth: 1280, quality: 0.85 });
     const blob = liveFrame || lastFrameRef.current;
-    if (!blob) { setError("Gagal menangkap frame"); setState("READY"); return; }
+    if (!blob) { setError(t("frame_capture_error")); setState("READY"); return; }
     try {
       const { status: aS, data: aD } = await scanApi.analyze(blob, barcodeResult || undefined);
-      if (aS === 409) { setError((aD as { detail?: string }).detail || "Barcode sudah di-scan hari ini"); setState("READY"); return; }
-      if (aS !== 200) { setError((aD as { detail?: string }).detail || "Analisis gagal"); setState("READY"); return; }
+      if (aS === 409) { setError((aD as { detail?: string }).detail || t("barcode_scanned_today")); setState("READY"); return; }
+      if (aS !== 200) { setError((aD as { detail?: string }).detail || t("analyze_failed")); setState("READY"); return; }
       const aResult = aD as AnalyzeResult;
       setAnalyzeResult(aResult);
       const { status: cS, data: cD } = await scanApi.confirm(aResult.scan_id);
-      if (cS !== 200) { setError((cD as { detail?: string }).detail || "Konfirmasi gagal"); setState("READY"); return; }
+      if (cS !== 200) { setError((cD as { detail?: string }).detail || t("confirm_failed")); setState("READY"); return; }
       setConfirmResult(cD as ConfirmResult);
-      setState("CONFIRMED"); setStatusText("🎉 Berhasil disetor!");
+      setState("CONFIRMED"); setStatusText(<div className="flex items-center justify-center gap-1.5"><span className="material-symbols-outlined text-sm text-primary">celebration</span> {t("success_submitted")}</div>);
       await refreshUser();
-    } catch { setError("Koneksi gagal saat menyetor"); setState("READY"); }
+    } catch { setError(t("connection_failed")); setState("READY"); }
   };
 
   const scanAgain = () => {
@@ -566,13 +591,13 @@ export default function ScanViewport() {
             {state === "IDLE" && (
               <div className="absolute inset-0 flex items-center justify-center flex-col">
                 <span className="material-symbols-outlined text-primary-fixed text-7xl mb-4 opacity-60">qr_code_scanner</span>
-                <p className="text-primary-fixed/70 text-sm font-medium">Tekan tombol di bawah untuk mulai scan</p>
-                <p className="text-primary-fixed/50 text-xs mt-2">AI Deteksi Botol + Barcode Scanner</p>
+                <p className="text-primary-fixed/70 text-sm font-medium">{t("press_start_scan")}</p>
+                <p className="text-primary-fixed/50 text-xs mt-2">{t("ai_barcode_desc")}</p>
               </div>
             )}
             {state !== "IDLE" && (
-              <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-black/70 backdrop-blur-sm">
-                <p className="text-primary-fixed text-sm font-semibold">{statusText}</p>
+              <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+                <div className="text-primary-fixed text-sm font-semibold">{statusText}</div>
               </div>
             )}
             {state === "SCANNING" && !bottleDetected && <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-0.5 bg-primary-fixed/60 animate-pulse" />}
@@ -606,13 +631,13 @@ export default function ScanViewport() {
         {state === "IDLE" && (
           <div className="flex flex-col gap-3">
             <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/20">
-              <label className="block text-xs font-semibold text-tertiary mb-2">Kamera Aktif</label>
+              <label className="block text-xs font-semibold text-tertiary mb-2">{t("active_camera")}</label>
               <select
                 value={selectedCameraId}
                 onChange={(event) => setSelectedCameraId(event.target.value)}
                 className="w-full rounded-lg bg-surface-container-high px-3 py-2 text-sm text-on-surface outline-none"
               >
-                {cameraDevices.length === 0 && <option value="">Default Camera</option>}
+                {cameraDevices.length === 0 && <option value="">{t("default_camera")}</option>}
                 {cameraDevices.map((camera) => (
                   <option key={camera.id} value={camera.id}>{camera.label}</option>
                 ))}
@@ -620,32 +645,32 @@ export default function ScanViewport() {
             </div>
             <button onClick={startScanning} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>center_focus_strong</span>
-              Mulai Scan
+              {t("start_scan")}
             </button>
           </div>
         )}
         {state === "SCANNING" && (
           <button onClick={stopScanning} className="w-full py-5 rounded-2xl font-bold text-lg bg-error text-on-error shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-2xl">stop_circle</span> Stop Scan
+            <span className="material-symbols-outlined text-2xl">stop_circle</span> {t("stop_scan")}
           </button>
         )}
         {state === "READY" && (
           <div className="flex gap-3">
             <button onClick={handleConfirm} className="flex-1 py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>add_circle</span>
-              Setorkan Botol
+              {t("submit_bottle")}
             </button>
             <button onClick={scanAgain} className="px-6 py-5 rounded-2xl font-bold text-lg bg-surface-container-high text-tertiary hover:scale-[1.02] active:scale-[0.98] transition-all">↻</button>
           </div>
         )}
         {state === "CONFIRMING" && (
           <div className="w-full py-5 rounded-2xl font-bold text-lg bg-surface-container-high text-tertiary flex items-center justify-center gap-3">
-            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> Memproses setoran...
+            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> {t("processing_submission")}
           </div>
         )}
         {state === "CONFIRMED" && (
           <button onClick={scanAgain} className="w-full py-5 rounded-2xl font-bold text-lg gradient-primary text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-2xl">restart_alt</span> Scan Lagi
+            <span className="material-symbols-outlined text-2xl">restart_alt</span> {t("scan_again")}
           </button>
         )}
         {error && <div className="p-4 bg-error-container text-on-error-container rounded-xl text-sm font-medium">{error}</div>}
@@ -656,7 +681,7 @@ export default function ScanViewport() {
           <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl">eco</span></div>
-              <div><h4 className="font-bold text-on-surface font-headline">Botol Terdeteksi</h4><p className="text-tertiary text-xs">Preview — belum dikonfirmasi</p></div>
+              <div><h4 className="font-bold text-on-surface font-headline">{t("bottle_detected")}</h4><p className="text-tertiary text-xs">{t("preview_unconfirmed")}</p></div>
             </div>
             <div className="space-y-3">
               {detections.map((d, i) => (
@@ -672,7 +697,7 @@ export default function ScanViewport() {
               <div className="mt-4 p-3 bg-primary/5 rounded-xl border border-primary/15">
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary text-lg">barcode</span>
-                  <div><p className="font-bold text-on-surface text-sm">Barcode: {barcodeResult}</p><p className="text-tertiary text-[10px]">Produk teridentifikasi via EAN-13</p></div>
+                  <div><p className="font-bold text-on-surface text-sm">Barcode: {barcodeResult}</p><p className="text-tertiary text-[10px]">{t("product_identified_ean")}</p></div>
                 </div>
               </div>
             )}
@@ -683,11 +708,11 @@ export default function ScanViewport() {
           <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span></div>
-              <div><h4 className="font-bold text-on-surface font-headline">Berhasil Disetor!</h4><p className="text-tertiary text-xs">{analyzeResult?.total_items ?? 0} botol dikonfirmasi</p></div>
+              <div><h4 className="font-bold text-on-surface font-headline">{t("success_submitted")}</h4><p className="text-tertiary text-xs">{analyzeResult?.total_items ?? 0} {t("bottles_confirmed")}</p></div>
             </div>
             <div className="space-y-3">
               <div className="flex justify-between items-center p-4 bg-secondary-container rounded-xl">
-                <span className="text-on-secondary-container text-sm font-medium">Saldo Ditambahkan</span>
+                <span className="text-on-secondary-container text-sm font-medium">{t("balance_added")}</span>
                 <span className="font-black text-primary text-xl font-headline">+Rp{(confirmResult.amount_credited ?? 0).toLocaleString("id")}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-surface rounded-xl">
@@ -708,14 +733,14 @@ export default function ScanViewport() {
                   <span className="font-bold text-on-surface text-sm">{confirmResult.gamification.level_title}</span>
                 </div>
                 {confirmResult.gamification.level_up && (
-                  <div className="p-4 bg-primary/10 rounded-xl text-center animate-bounce">
-                    <p className="text-primary font-bold text-lg">🎉 Level Up!</p>
-                    <p className="text-primary/70 text-xs">{confirmResult.gamification.level_title}</p>
+                  <div className="p-4 bg-primary/10 rounded-xl text-center animate-bounce flex flex-col items-center">
+                    <div className="text-primary font-bold text-lg flex items-center gap-1.5 justify-center"><span className="material-symbols-outlined">celebration</span> {t("level_up")}</div>
+                    <p className="text-primary/70 text-xs mt-1">{confirmResult.gamification.level_title}</p>
                   </div>
                 )}
                 {confirmResult.gamification.new_achievements?.map((ach, i) => (
                   <div key={i} className="p-3 bg-primary/10 rounded-xl flex items-center gap-3">
-                    <span className="text-2xl">{ach.icon}</span>
+                    <span className="material-symbols-outlined text-2xl text-primary" style={{ fontVariationSettings: '"FILL" 1' }}>{ach.icon || "emoji_events"}</span>
                     <div><p className="font-bold text-primary text-sm">{ach.title}</p><p className="text-primary/70 text-xs">{ach.description}</p></div>
                   </div>
                 ))}
@@ -726,13 +751,13 @@ export default function ScanViewport() {
 
         {state === "IDLE" && (
           <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-            <h4 className="font-bold text-on-surface font-headline mb-4">Cara Scan</h4>
+            <h4 className="font-bold text-on-surface font-headline mb-4">{t("how_to_scan")}</h4>
             <div className="space-y-4">
               {[
-                { icon: "center_focus_strong", title: "Mulai Scan", desc: "Aktifkan kamera dengan tombol di bawah" },
-                { icon: "smart_toy", title: "AI Deteksi Botol", desc: "YOLO mendeteksi apakah objek adalah botol" },
-                { icon: "barcode_scanner", title: "Barcode Scan", desc: "ZXing membaca barcode EAN-13 dari botol" },
-                { icon: "check_circle", title: "Konfirmasi", desc: "Kedua check lolos → tekan Setorkan untuk saldo" },
+                { icon: "center_focus_strong", title: t("start_scan"), desc: t("step_1_desc") },
+                { icon: "smart_toy", title: t("step_2_title") || "AI Deteksi", desc: t("step_2_desc") },
+                { icon: "barcode_scanner", title: t("step_3_title") || "Barcode", desc: t("step_3_desc") },
+                { icon: "check_circle", title: t("step_4_title") || "Konfirmasi", desc: t("step_4_desc") },
               ].map((step, i) => (
                 <div key={step.title} className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">

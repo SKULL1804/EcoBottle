@@ -3,9 +3,11 @@
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import { statsApi } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function QuickStats() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [achCount, setAchCount] = useState(0);
 
   useEffect(() => {
@@ -15,15 +17,15 @@ export default function QuickStats() {
   }, []);
 
   const stats = [
-    { icon: "recycling", label: "Total Botol", value: `${user?.total_scans ?? 0}` },
-    { icon: "savings", label: "Total Earned", value: `Rp ${(user?.balance ?? 0).toLocaleString("id")}` },
-    { icon: "stars", label: "Poin", value: `${(user?.points ?? 0).toLocaleString("id")}` },
-    { icon: "emoji_events", label: "Badges", value: `${achCount}/6` },
+    { icon: "recycling", label: t("total_bottles"), value: `${user?.total_scans ?? 0}` },
+    { icon: "savings", label: t("total_earned"), value: `Rp ${(user?.balance ?? 0).toLocaleString("id")}` },
+    { icon: "stars", label: t("points"), value: `${(user?.points ?? 0).toLocaleString("id")}` },
+    { icon: "emoji_events", label: t("badges"), value: `${achCount}/6` },
   ];
 
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-      <h4 className="font-bold text-on-surface font-headline mb-4">Ringkasan</h4>
+      <h4 className="font-bold text-on-surface font-headline mb-4">{t("summary")}</h4>
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (
           <div key={s.label} className="p-4 bg-surface rounded-xl text-center">

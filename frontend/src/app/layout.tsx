@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import Script from "next/script";
 
 const inter = Inter({
@@ -40,9 +41,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { statsApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface StatsData {
   total_scans: number;
@@ -15,6 +16,7 @@ interface StatsData {
 
 export default function StatsOverview() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<StatsData | null>(null);
 
   useEffect(() => {
@@ -24,10 +26,10 @@ export default function StatsOverview() {
   }, []);
 
   const cards = [
-    { icon: "recycling", label: "Total Botol", value: `${stats?.total_scans ?? user?.total_scans ?? 0}`, subtitle: "botol daur ulang" },
-    { icon: "stars", label: "Total Poin", value: `${(stats?.points ?? user?.points ?? 0).toLocaleString("id")}`, subtitle: `${stats?.level_title ?? user?.level_title ?? "Pemula"}` },
-    { icon: "emoji_events", label: "Achievements", value: `${stats?.achievements_count ?? 0}`, subtitle: "badges diraih" },
-    { icon: "savings", label: "Total Saldo", value: `Rp ${(stats?.balance ?? user?.balance ?? 0).toLocaleString("id")}`, subtitle: "pendapatan" },
+    { icon: "recycling", label: t("total_bottles") || "Total Botol", value: `${stats?.total_scans ?? user?.total_scans ?? 0}`, subtitle: t("recycled_bottles") || "botol daur ulang" },
+    { icon: "stars", label: t("total_points") || "Total Poin", value: `${(stats?.points ?? user?.points ?? 0).toLocaleString("id")}`, subtitle: `${stats?.level_title ?? user?.level_title ?? (t("starter") || "Pemula")}` },
+    { icon: "emoji_events", label: t("achievements") || "Achievements", value: `${stats?.achievements_count ?? 0}`, subtitle: t("badges_earned") || "badges diraih" },
+    { icon: "savings", label: t("total_balance") || "Total Saldo", value: `Rp ${(stats?.balance ?? user?.balance ?? 0).toLocaleString("id")}`, subtitle: t("income") || "pendapatan" },
   ];
 
   return (

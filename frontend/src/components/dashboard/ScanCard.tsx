@@ -1,7 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ScanCard() {
+  const { t } = useLanguage();
+
   return (
     <section className="md:col-span-4 lg:col-span-3 bg-gradient-to-br from-on-primary-container to-primary text-on-primary rounded-xl p-8 flex flex-col justify-between shadow-xl relative overflow-hidden">
       {/* Background image overlay */}
@@ -17,15 +22,15 @@ export default function ScanCard() {
 
       <div className="relative z-10">
         <h3 className="text-3xl font-black mb-2 leading-tight font-headline">
-          Scan Botol
+          {t("scan_title")}
         </h3>
         <p className="text-primary-fixed opacity-90 max-w-[240px]">
-          Ready to turn your plastic waste into rewards? Scan now.
+          {t("scan_desc")}
         </p>
       </div>
 
       <div className="relative z-10 mt-8">
-        <Link 
+        <Link
           href="/dashboard/scan"
           className="group flex items-center justify-between w-full p-4 bg-surface-container-lowest/10 backdrop-blur-md rounded-2xl hover:bg-surface-container-lowest/20 transition-all cursor-pointer"
         >
@@ -38,7 +43,7 @@ export default function ScanCard() {
                 qr_code_scanner
               </span>
             </div>
-            <span className="font-bold text-lg">Start Scanning</span>
+            <span className="font-bold text-lg">{t("scan_start")}</span>
           </div>
           <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">
             arrow_forward

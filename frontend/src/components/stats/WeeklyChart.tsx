@@ -1,6 +1,10 @@
+"use client";
+
 import { WEEKLY_DATA } from "@/constants/stats";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function WeeklyChart() {
+  const { t } = useLanguage();
   const maxBottles = Math.max(...WEEKLY_DATA.map((d) => d.bottles));
 
   return (
@@ -8,15 +12,15 @@ export default function WeeklyChart() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h4 className="font-bold text-on-surface font-headline">
-            Aktivitas Mingguan
+            {t("weekly_activity") || "Aktivitas Mingguan"}
           </h4>
           <p className="text-tertiary text-xs mt-0.5">
-            Jumlah botol yang di-scan per hari
+            {t("bottles_scanned_per_day") || "Jumlah botol yang di-scan per hari"}
           </p>
         </div>
         <div className="flex items-center gap-2 bg-surface-container rounded-full px-3 py-1.5">
           <span className="w-2 h-2 rounded-full bg-primary" />
-          <span className="text-tertiary text-xs font-medium">Minggu Ini</span>
+          <span className="text-tertiary text-xs font-medium">{t("this_week") || "Minggu Ini"}</span>
         </div>
       </div>
 
@@ -53,13 +57,13 @@ export default function WeeklyChart() {
 
       <div className="flex justify-between items-center mt-6 pt-4 border-t border-surface-container">
         <div>
-          <span className="text-tertiary text-xs">Total minggu ini</span>
+          <span className="text-tertiary text-xs">{t("total_this_week") || "Total minggu ini"}</span>
           <p className="text-xl font-black text-on-surface font-headline">
-            {WEEKLY_DATA.reduce((s, d) => s + d.bottles, 0)} Botol
+            {WEEKLY_DATA.reduce((s, d) => s + d.bottles, 0)} {t("bottles") || "Botol"}
           </p>
         </div>
         <div className="text-right">
-          <span className="text-tertiary text-xs">Rata-rata / hari</span>
+          <span className="text-tertiary text-xs">{t("avg_per_day") || "Rata-rata / hari"}</span>
           <p className="text-xl font-black text-primary font-headline">
             {(WEEKLY_DATA.reduce((s, d) => s + d.bottles, 0) / 7).toFixed(1)}
           </p>

@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { statsApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface LeaderEntry { rank: number; name: string; total_scans: number; }
 interface LeaderboardData { leaderboard: LeaderEntry[]; user_rank: number; }
 
 export default function Leaderboard() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [data, setData] = useState<LeaderboardData | null>(null);
 
   useEffect(() => {
@@ -23,12 +25,12 @@ export default function Leaderboard() {
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
-        <h4 className="font-bold text-on-surface font-headline">Leaderboard</h4>
-        {userRank > 0 && <span className="text-tertiary text-xs font-medium">Peringkat kamu: #{userRank}</span>}
+        <h4 className="font-bold text-on-surface font-headline">{t("leaderboard") || "Leaderboard"}</h4>
+        {userRank > 0 && <span className="text-tertiary text-xs font-medium">{t("your_rank") || "Peringkat kamu:"} #{userRank}</span>}
       </div>
 
       {entries.length === 0 ? (
-        <p className="text-tertiary text-sm text-center py-8">Belum ada data leaderboard</p>
+        <p className="text-tertiary text-sm text-center py-8">{t("no_leaderboard_data") || "Belum ada data leaderboard"}</p>
       ) : (
         <div className="space-y-2">
           {entries.map((entry) => {
@@ -48,12 +50,12 @@ export default function Leaderboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-bold truncate ${isUser ? "text-primary" : "text-on-surface"}`}>
-                    {entry.name}{isUser && <span className="text-[10px] text-primary font-medium ml-2">(Kamu)</span>}
+                    {entry.name}{isUser && <span className="text-[10px] text-primary font-medium ml-2">({t("you") || "Kamu"})</span>}
                   </p>
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-sm font-black text-on-surface font-headline">{entry.total_scans}</span>
-                  <span className="text-tertiary text-[10px] ml-1">botol</span>
+                  <span className="text-tertiary text-[10px] ml-1">{t("bottles") || "botol"}</span>
                 </div>
               </div>
             );

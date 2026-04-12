@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { statsApi } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Achievement {
   id: string;
@@ -21,6 +22,7 @@ const ALL_ACHIEVEMENTS = [
 ];
 
 export default function AchievementGrid() {
+  const { t } = useLanguage();
   const [earned, setEarned] = useState<Achievement[]>([]);
 
   useEffect(() => {
@@ -34,8 +36,8 @@ export default function AchievementGrid() {
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
-        <h4 className="font-bold text-on-surface font-headline">Achievements</h4>
-        <span className="text-tertiary text-xs font-medium">{earned.length}/{ALL_ACHIEVEMENTS.length} Unlocked</span>
+        <h4 className="font-bold text-on-surface font-headline">{t("achievements") || "Achievements"}</h4>
+        <span className="text-tertiary text-xs font-medium">{earned.length}/{ALL_ACHIEVEMENTS.length} {t("unlocked") || "Unlocked"}</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -46,8 +48,12 @@ export default function AchievementGrid() {
               <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center ${unlocked ? "bg-primary text-on-primary shadow-md shadow-primary/20" : "bg-surface-container-high text-outline"}`}>
                 <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: unlocked ? '"FILL" 1' : '"FILL" 0' }}>{unlocked ? ach.icon : "lock"}</span>
               </div>
-              <p className={`text-xs font-bold ${unlocked ? "text-on-surface" : "text-tertiary"}`}>{ach.title}</p>
-              <p className="text-tertiary text-[10px] mt-1">{ach.description}</p>
+              <p className={`text-xs font-bold ${unlocked ? "text-on-surface" : "text-tertiary"}`}>
+                {t(`ach_${ach.title.toLowerCase().replace(/ /g, "_")}`) || ach.title}
+              </p>
+              <p className="text-tertiary text-[10px] mt-1">
+                {t(`ach_${ach.title.toLowerCase().replace(/ /g, "_")}_desc`) || ach.description}
+              </p>
             </div>
           );
         })}

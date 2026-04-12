@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SIDE_NAV_ITEMS } from "@/constants/dashboard";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -18,9 +20,12 @@ export default function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col p-4 space-y-2 h-screen w-64 bg-surface-container-low font-headline font-medium sticky top-0">
       {/* Brand */}
-      <div className="px-4 py-6 mb-4">
-        <h1 className="text-xl font-bold text-primary">EcoBottle</h1>
-      </div>
+      <Link href="/dashboard" className="px-4 py-6 mb-2 flex items-center gap-3 group">
+        <div className="w-9 h-9 rounded-xl bg-linear-to-br from-on-primary-container to-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
+           <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>recycling</span>
+        </div>
+        <div className="text-xl font-extrabold tracking-tight text-primary font-headline">EcoBottle</div>
+      </Link>
 
       {/* User info */}
       {user && (
@@ -44,6 +49,7 @@ export default function Sidebar() {
       <nav className="flex-1 space-y-1">
         {SIDE_NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const navKey = `nav_${item.label.toLowerCase()}` as Parameters<typeof t>[0];
           return (
             <Link key={item.label} href={item.href} className={
               isActive
@@ -51,7 +57,7 @@ export default function Sidebar() {
                 : "flex items-center gap-3 px-4 py-3 text-tertiary hover:bg-primary-fixed/8 transition-all duration-300 ease-in-out"
             }>
               <span className="material-symbols-outlined">{item.icon}</span>
-              <span>{item.label}</span>
+              <span>{t(navKey) || item.label}</span>
             </Link>
           );
         })}
@@ -60,7 +66,7 @@ export default function Sidebar() {
       {/* Logout */}
       <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-tertiary hover:bg-error/10 hover:text-error rounded-xl transition-all">
         <span className="material-symbols-outlined">logout</span>
-        <span>Keluar</span>
+        <span>{t("logout")}</span>
       </button>
     </aside>
   );

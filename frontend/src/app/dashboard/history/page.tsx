@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HistoryList from "@/components/history/HistoryList";
 import ExportButton from "@/components/history/ExportButton";
+import PageHeader from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "Riwayat — EcoBottle",
@@ -12,17 +13,11 @@ export default function HistoryPage() {
   return (
     <>
       {/* Header */}
-      <header className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-on-background font-headline">
-            Riwayat
-          </h2>
-          <p className="text-tertiary">
-            Seluruh transaksi & aktivitas akun Anda
-          </p>
-        </div>
-        <ExportButton />
-      </header>
+      <PageHeader
+        titleKey="history_page_title"
+        descKey="history_page_desc"
+        rightElement={<ExportButton />}
+      />
 
       <HistoryList />
     </>

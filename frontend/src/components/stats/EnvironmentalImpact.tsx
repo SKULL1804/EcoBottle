@@ -1,9 +1,11 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function EnvironmentalImpact() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   
   // Asumsi setiap botol setara dengan pencegahan x dampak lingkungan
   const totalBottles = user?.total_scans || 127; 
@@ -22,15 +24,15 @@ export default function EnvironmentalImpact() {
       <div className="relative z-10">
         <h4 className="font-bold text-on-primary/90 font-headline mb-6 flex items-center gap-2">
           <span className="material-symbols-outlined pb-1">public</span>
-          Dampak Lingkungan
+          {t("env_impact") || "Dampak Lingkungan"}
         </h4>
 
         <div className="space-y-6">
-          <ImpactRow icon="co2" label="CO₂ Dicegah" value={`${co2Saved} kg`} desc="Mengurangi emisi gas rumah kaca" />
+          <ImpactRow icon="co2" label={t("co2_prevented") || "CO₂ Dicegah"} value={`${co2Saved} kg`} desc={t("reduce_ghg_emissions") || "Mengurangi emisi gas rumah kaca"} />
           <div className="border-t border-on-primary/10" />
-          <ImpactRow icon="bolt" label="Energi Dihemat" value={`${energySaved} kWh`} desc="Cukup untuk menyalakan TV hingga 40 jam" />
+          <ImpactRow icon="bolt" label={t("energy_saved") || "Energi Dihemat"} value={`${energySaved} kWh`} desc={t("tv_40_hours_desc") || "Cukup untuk menyalakan TV hingga 40 jam"} />
           <div className="border-t border-on-primary/10" />
-          <ImpactRow icon="water_drop" label="Air Terjaga" value={`${waterSaved} Liter`} desc="Melestarikan cadangan air bersih" />
+          <ImpactRow icon="water_drop" label={t("water_preserved") || "Air Terjaga"} value={`${waterSaved} Liter`} desc={t("conserve_clean_water") || "Melestarikan cadangan air bersih"} />
         </div>
       </div>
     </div>

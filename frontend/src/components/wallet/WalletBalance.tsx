@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function WalletBalance() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const balance = user?.balance || 0;
 
   return (
@@ -23,10 +25,10 @@ export default function WalletBalance() {
               <p className="text-primary-fixed text-xs">{user?.level_title || "Pemula"}</p>
             </div>
           </div>
-          <span className="bg-surface-container-lowest/15 backdrop-blur-sm text-primary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">ACTIVE</span>
+          <span className="bg-surface-container-lowest/15 backdrop-blur-sm text-primary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">{t("active")}</span>
         </div>
 
-        <p className="text-primary-fixed/60 text-sm font-medium mb-1">Total Saldo</p>
+        <p className="text-primary-fixed/60 text-sm font-medium mb-1">{t("total_balance")}</p>
         <h2 className="text-5xl font-black font-headline tracking-tighter mb-8">
           Rp {Number(balance).toLocaleString("id")}
         </h2>
@@ -34,11 +36,11 @@ export default function WalletBalance() {
         <div className="grid grid-cols-2 gap-3">
           <Link href="/dashboard/withdraw" className="py-3 bg-surface-container-lowest text-primary font-bold rounded-xl text-sm hover:scale-[1.03] active:scale-[0.97] transition-transform shadow-lg text-center flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-lg">payments</span>
-            Withdraw
+            {t("withdraw")}
           </Link>
           <Link href="/dashboard/history" className="py-3 bg-surface-container-lowest/15 backdrop-blur-sm text-on-primary font-bold rounded-xl text-sm hover:bg-surface-container-lowest/25 transition-all text-center flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-lg">history</span>
-            Riwayat
+            {t("history")}
           </Link>
         </div>
       </div>

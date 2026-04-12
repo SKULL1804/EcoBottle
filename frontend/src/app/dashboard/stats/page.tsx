@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import StatsOverview from "@/components/stats/StatsOverview";
+import PageHeader from "@/components/layout/PageHeader";
 import WeeklyChart from "@/components/stats/WeeklyChart";
 import EnvironmentalImpact from "@/components/stats/EnvironmentalImpact";
 import MonthlyTrend from "@/components/stats/MonthlyTrend";
@@ -17,17 +18,11 @@ export default function StatsPage() {
   return (
     <>
       {/* Header */}
-      <header className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-on-background font-headline">
-            Statistik
-          </h2>
-          <p className="text-tertiary">
-            Pantau progress daur ulang & dampak lingkungan
-          </p>
-        </div>
-        <MonthPicker />
-      </header>
+      <PageHeader
+        titleKey="stats_page_title"
+        descKey="stats_page_desc"
+        rightElement={<MonthPicker />}
+      />
 
       {/* Overview Cards */}
       <StatsOverview />
