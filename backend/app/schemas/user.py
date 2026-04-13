@@ -80,7 +80,7 @@ class UserResponse(BaseModel):
     balance: Decimal = Decimal("0.00")
     total_scans: int = 0
     level: int = 1
-    level_title: str = "🌱 Pemula"
+    level_title: str = "Pemula"
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -132,3 +132,26 @@ class LeaderboardEntry(BaseModel):
 class LeaderboardResponse(BaseModel):
     leaderboard: list[LeaderboardEntry]
     user_rank: int | None = None
+
+
+class WeeklyStatsPoint(BaseModel):
+    day: str
+    date: str
+    bottles: int
+
+
+class WeeklyStatsResponse(BaseModel):
+    points: list[WeeklyStatsPoint]
+    total_bottles: int
+    avg_per_day: float
+
+
+class MonthlyTrendPoint(BaseModel):
+    month: str
+    year: int
+    bottles: int
+
+
+class MonthlyTrendResponse(BaseModel):
+    points: list[MonthlyTrendPoint]
+    growth_percent: int

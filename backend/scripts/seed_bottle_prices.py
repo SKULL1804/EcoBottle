@@ -44,7 +44,7 @@ async def seed():
         existing = result.scalars().all()
         
         if existing:
-            print(f"⚠️  Database sudah memiliki {len(existing)} jenis botol.")
+            print(f"Database sudah memiliki {len(existing)} jenis botol.")
             print("   Menghapus data lama dan memasukkan data baru...")
             for b in existing:
                 await session.delete(b)
@@ -56,10 +56,10 @@ async def seed():
             session.add(bottle)
 
         await session.commit()
-        print(f"✅ Berhasil memasukkan {len(BOTTLE_PRICES)} jenis botol ke database!")
+        print(f"Berhasil memasukkan {len(BOTTLE_PRICES)} jenis botol ke database!")
         
         # Print summary
-        print("\n📋 Daftar Harga Botol Daur Ulang:")
+        print("\nDaftar Harga Botol Daur Ulang:")
         print("-" * 55)
         for d in BOTTLE_PRICES:
             print(f"   {d['name']:<35} Rp{d['price_idr']:>6}")

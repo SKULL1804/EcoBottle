@@ -65,6 +65,8 @@ export const statsApi = {
     me: () => api("GET", "/stats/me"),
     achievements: () => api("GET", "/stats/achievements"),
     leaderboard: (limit = 10) => api("GET", `/stats/leaderboard?limit=${limit}`),
+    weekly: () => api("GET", "/stats/weekly"),
+    monthly: (months = 6) => api("GET", `/stats/monthly?months=${months}`),
 };
 
 export const txApi = {

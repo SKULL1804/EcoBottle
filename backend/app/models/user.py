@@ -28,7 +28,7 @@ class User(Base):
     balance: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=Decimal("0.00"))
     total_scans: Mapped[int] = mapped_column(Integer, default=0)
     level: Mapped[int] = mapped_column(Integer, default=1)
-    level_title: Mapped[str] = mapped_column(String(50), default="🌱 Pemula")
+    level_title: Mapped[str] = mapped_column(String(50), default="Pemula")
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()
     )

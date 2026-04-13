@@ -1,5 +1,5 @@
 """
-🌿 EcoBottle — Backend API
+EcoBottle — Backend API
 FastAPI entry point with CORS, router registration, and database init.
 """
 
@@ -26,28 +26,28 @@ async def lifespan(app: FastAPI):
     upload_dir = Path(settings.UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
     
-    print("🌿 EcoBottle API is ready!")
-    print(f"📄 Swagger UI: http://localhost:8000/docs")
+    print("EcoBottle API is ready")
+    print("Swagger UI: http://localhost:8000/docs")
     yield
     # Shutdown
-    print("👋 EcoBottle API shutting down...")
+    print("EcoBottle API shutting down...")
 
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="""
-    🌿 **EcoBottle API** — Platform daur ulang botol dengan AI Scanner.
+    **EcoBottle API** — Platform daur ulang botol dengan AI Scanner.
     
     ## Fitur Utama
-    * 🤖 **AI Scanner** — Foto botol, deteksi otomatis jenis & harga
-    * 💰 **Sistem Saldo & Poin** — Kumpulkan poin dari setoran botol
-    * 🔐 **Autentikasi JWT** — Register, login, refresh token
-    * 📊 **Riwayat Transaksi** — Lacak setoran & pencairan
+    * **AI Scanner** — Foto botol, deteksi otomatis jenis & harga
+    * **Sistem Saldo & Poin** — Kumpulkan poin dari setoran botol
+    * **Autentikasi JWT** — Register, login, refresh token
+    * **Riwayat Transaksi** — Lacak setoran & pencairan
     
     ## Cara Menggunakan
     1. Register/Login untuk mendapatkan access token
-    2. Klik tombol **Authorize** 🔒 di atas dan masukkan token
+    2. Klik tombol **Authorize** di atas dan masukkan token
     3. Upload foto botol ke endpoint **/scan/analyze**
     4. Konfirmasi setoran untuk mendapatkan saldo & poin
     """,
@@ -98,7 +98,7 @@ async def root():
     return {
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "status": "🌿 Healthy",
+        "status": "healthy",
         "docs": "/docs",
     }
 

@@ -14,6 +14,29 @@ export interface WeeklyData {
   bottles: number;
 }
 
+export interface WeeklyStatsPoint {
+  day: string;
+  date: string;
+  bottles: number;
+}
+
+export interface WeeklyStatsResponse {
+  points: WeeklyStatsPoint[];
+  total_bottles: number;
+  avg_per_day: number;
+}
+
+export interface MonthlyTrendPoint {
+  month: string;
+  year: number;
+  bottles: number;
+}
+
+export interface MonthlyTrendResponse {
+  points: MonthlyTrendPoint[];
+  growth_percent: number;
+}
+
 /** Bottle type breakdown data. */
 export interface BottleType {
   label: string;

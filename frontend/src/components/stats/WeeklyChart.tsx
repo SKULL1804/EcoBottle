@@ -1,11 +1,28 @@
 "use client";
 
-import { WEEKLY_DATA } from "@/constants/stats";
+import { useEffect, useMemo, useState } from "react";
+import { statsApi } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import type { WeeklyStatsPoint, WeeklyStatsResponse } from "@/types/stats";
 
 export default function WeeklyChart() {
   const { t } = useLanguage();
-  const maxBottles = Math.max(...WEEKLY_DATA.map((d) => d.bottles));
+  const [points, setPoints] = useState<WeeklyStatsPoint[]>([]);
+  const [summary, setSummary] = useState<{ total: number; avg: number }>({ total: 0, avg: 0 });
+
+  useEffect(() => {
+    const loadWeekly = async () => {
+      const { status, data } = await statsApi.weekly();
+      if (status === 200) {
+        const weekly = data as WeeklyStatsResponse;
+        setPoints(weekly.points || []);
+        setSummary({ total: weekly.total_bottles || 0, avg: weekly.avg_per_day || 0 });
+      }
+    };
+    loadWeekly().catch(() => undefined);
+  }, []);
+
+  const maxBottles = useMemo(() => Math.max(1, ...points.map((d) => d.bottles)), [points]);
 
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
@@ -25,11 +42,11 @@ export default function WeeklyChart() {
       </div>
 
       <div className="flex items-end gap-3 h-48">
-        {WEEKLY_DATA.map((d) => {
+        {points.map((d) => {
           const heightPct = (d.bottles / maxBottles) * 100;
           return (
             <div
-              key={d.day}
+              key={d.date}
               className="flex-1 flex flex-col items-center gap-2"
             >
               <span className="text-xs font-bold text-primary">
@@ -59,13 +76,13 @@ export default function WeeklyChart() {
         <div>
           <span className="text-tertiary text-xs">{t("total_this_week") || "Total minggu ini"}</span>
           <p className="text-xl font-black text-on-surface font-headline">
-            {WEEKLY_DATA.reduce((s, d) => s + d.bottles, 0)} {t("bottles") || "Botol"}
+            {summary.total} {t("bottles") || "Botol"}
           </p>
         </div>
         <div className="text-right">
           <span className="text-tertiary text-xs">{t("avg_per_day") || "Rata-rata / hari"}</span>
           <p className="text-xl font-black text-primary font-headline">
-            {(WEEKLY_DATA.reduce((s, d) => s + d.bottles, 0) / 7).toFixed(1)}
+            {summary.avg.toFixed(1)}
           </p>
         </div>
       </div>

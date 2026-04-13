@@ -90,14 +90,14 @@ async def create_payout(
     result = response.json()
 
     if response.status_code not in (200, 201):
-        print(f"❌ Xendit payout failed: {result}")
+        print(f"Xendit payout failed: {result}")
         return {
             "success": False,
             "error": result.get("message", "Payout failed"),
             "error_code": result.get("error_code", "UNKNOWN"),
         }
 
-    print(f"✅ Xendit payout created: {result.get('id')} — {result.get('status')}")
+    print(f"Xendit payout created: {result.get('id')} — {result.get('status')}")
     return {
         "success": True,
         "xendit_id": result.get("id"),

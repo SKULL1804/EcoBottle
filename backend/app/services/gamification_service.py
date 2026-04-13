@@ -12,11 +12,11 @@ from app.models.achievement import Achievement
 
 # ─── Level System ─────────────────────────────────────────
 LEVELS = [
-    {"level": 1, "title": "🌱 Pemula",          "min_scans": 0},
-    {"level": 2, "title": "🌿 Penghijauan",     "min_scans": 10},
-    {"level": 3, "title": "🌳 Eco Warrior",      "min_scans": 50},
-    {"level": 4, "title": "🏆 Green Champion",   "min_scans": 150},
-    {"level": 5, "title": "🌍 Earth Guardian",   "min_scans": 500},
+    {"level": 1, "title": "Pemula",         "min_scans": 0},
+    {"level": 2, "title": "Penghijauan",    "min_scans": 10},
+    {"level": 3, "title": "Eco Warrior",    "min_scans": 50},
+    {"level": 4, "title": "Green Champion", "min_scans": 150},
+    {"level": 5, "title": "Earth Guardian", "min_scans": 500},
 ]
 
 
@@ -45,14 +45,14 @@ def get_next_level(total_scans: int) -> dict | None:
 
 # ─── Achievement Definitions ─────────────────────────────
 ACHIEVEMENT_DEFS = [
-    {"type": "first_scan",     "title": "Langkah Pertama",      "icon": "🎯", "desc": "Scan botol pertama kali!",            "trigger_scans": 1},
-    {"type": "scan_5",         "title": "Kolektor Pemula",      "icon": "📦", "desc": "Berhasil scan 5 botol",               "trigger_scans": 5},
-    {"type": "scan_10",        "title": "Eco Enthusiast",       "icon": "♻️", "desc": "Berhasil scan 10 botol",              "trigger_scans": 10},
-    {"type": "scan_25",        "title": "Pengumpul Handal",     "icon": "💪", "desc": "Berhasil scan 25 botol",              "trigger_scans": 25},
-    {"type": "scan_50",        "title": "Eco Warrior",          "icon": "⚔️", "desc": "Berhasil scan 50 botol!",             "trigger_scans": 50},
-    {"type": "scan_100",       "title": "Pahlawan Lingkungan",  "icon": "🦸", "desc": "100 botol terkumpul!",                "trigger_scans": 100},
-    {"type": "scan_250",       "title": "Green Legend",         "icon": "🌟", "desc": "250 botol — Kamu legenda!",           "trigger_scans": 250},
-    {"type": "scan_500",       "title": "Earth Guardian",       "icon": "🌍", "desc": "500 botol — Penjaga Bumi sejati!",    "trigger_scans": 500},
+    {"type": "first_scan",     "title": "Langkah Pertama",     "icon": "emoji_events",     "desc": "Scan botol pertama kali",             "trigger_scans": 1},
+    {"type": "scan_5",         "title": "Kolektor Pemula",     "icon": "inventory_2",      "desc": "Berhasil scan 5 botol",                "trigger_scans": 5},
+    {"type": "scan_10",        "title": "Eco Enthusiast",      "icon": "recycling",        "desc": "Berhasil scan 10 botol",               "trigger_scans": 10},
+    {"type": "scan_25",        "title": "Pengumpul Handal",    "icon": "fitness_center",   "desc": "Berhasil scan 25 botol",               "trigger_scans": 25},
+    {"type": "scan_50",        "title": "Eco Warrior",         "icon": "military_tech",    "desc": "Berhasil scan 50 botol",               "trigger_scans": 50},
+    {"type": "scan_100",       "title": "Pahlawan Lingkungan", "icon": "workspace_premium", "desc": "100 botol terkumpul",                 "trigger_scans": 100},
+    {"type": "scan_250",       "title": "Green Legend",        "icon": "star",             "desc": "250 botol tercapai",                  "trigger_scans": 250},
+    {"type": "scan_500",       "title": "Earth Guardian",      "icon": "public",           "desc": "500 botol tercapai",                  "trigger_scans": 500},
 ]
 
 
