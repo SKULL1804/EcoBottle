@@ -22,7 +22,7 @@ class Achievement(Base):
     type: Mapped[str] = mapped_column(String(50), nullable=False)  # e.g. 'first_scan', 'scan_10'
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
-    icon: Mapped[str] = mapped_column(String(10), nullable=False)  # emoji
+    icon: Mapped[str] = mapped_column(String(50), nullable=False)
     earned_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()
     )
