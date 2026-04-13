@@ -21,8 +21,8 @@ email-validator==2.2.0
 
 # AI & Image Processing (YOLOv8 — CPU only, no GPU needed on server)
 # torch CPU installed via Dockerfile --extra-index-url
-ultralytics>=8.2.0
-huggingface-hub>=0.24.0
+ultralytics==8.2.0
+huggingface-hub==0.24.0
 Pillow==10.4.0
 
 # Redis (optional for now)

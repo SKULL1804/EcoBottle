@@ -8,10 +8,13 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "engines": {
+    "node": ">=20.11 <23"
+  },
   "dependencies": {
-    "@tensorflow-models/coco-ssd": "^2.2.3",
-    "@tensorflow/tfjs": "^4.22.0",
-    "@zxing/library": "^0.21.3",
+    "@tensorflow-models/coco-ssd": "2.2.3",
+    "@tensorflow/tfjs": "4.22.0",
+    "@zxing/library": "0.21.3",
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4"
