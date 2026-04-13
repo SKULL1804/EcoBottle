@@ -11,7 +11,20 @@ type ScanState = "IDLE" | "SCANNING" | "READY" | "CONFIRMING" | "CONFIRMED";
 interface BBox { x1: number; y1: number; x2: number; y2: number; }
 interface Detection { bbox: BBox; class: string; label: string; type: string; confidence: number; }
 interface PreviewResult { detections: Detection[]; total_items: number; }
-interface AnalyzeResult { scan_id: string; detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[]; total_items: number; total_value: number; barcode?: string; }
+interface AnalyzeResult {
+  scan_id: string;
+  detected: { brand: string; type: string; quantity: number; subtotal: number; confidence: number }[];
+  total_items: number;
+  total_value: number;
+  barcode?: string;
+  product_lookup?: {
+    product_name?: string;
+    brands?: string;
+    quantity?: string;
+    packaging?: string;
+    categories?: string;
+  };
+}
 interface ConfirmResult { message: string; amount_credited: number; points_earned: number; new_balance: number; new_points: number; gamification?: { level: number; level_title: string; new_achievements: { title: string; icon: string; description: string }[]; level_up: boolean; }; }
 interface CameraDeviceOption { id: string; label: string; }
 
@@ -697,7 +710,16 @@ export default function ScanViewport() {
               <div className="mt-4 p-3 bg-primary/5 rounded-xl border border-primary/15">
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary text-lg">barcode</span>
-                  <div><p className="font-bold text-on-surface text-sm">Barcode: {barcodeResult}</p><p className="text-tertiary text-[10px]">{t("product_identified_ean")}</p></div>
+                  <div>
+                    <p className="font-bold text-on-surface text-sm">Barcode: {barcodeResult}</p>
+                    <p className="text-tertiary text-[10px]">{t("product_identified_ean")}</p>
+                    {analyzeResult?.product_lookup?.product_name && (
+                      <p className="text-tertiary text-[10px] mt-0.5">
+                        {analyzeResult.product_lookup.product_name}
+                        {analyzeResult.product_lookup.quantity ? ` • ${analyzeResult.product_lookup.quantity}` : ""}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

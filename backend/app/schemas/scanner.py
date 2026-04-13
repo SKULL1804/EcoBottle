@@ -28,6 +28,7 @@ class ScanResponse(BaseModel):
     total_points: int
     image_quality: str
     barcode: str | None = None
+    product_lookup: dict | None = None
     status: str = "pending"
 
 

@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://20.247.16.65:8000";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
 const nextConfig: NextConfig = {
   images: {

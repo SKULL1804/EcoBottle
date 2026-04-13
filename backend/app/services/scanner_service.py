@@ -171,6 +171,7 @@ async def process_scan(
         total_points=total_points,
         image_quality=ai_result.get("image_quality", "good"),
         barcode=barcode,
+        product_lookup=ai_result.get("lookup"),
         status="pending",
     )
 
