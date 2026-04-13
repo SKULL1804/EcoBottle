@@ -17,7 +17,7 @@ export default function Navbar() {
           }
         });
       },
-      { rootMargin: "-20% 0px -60% 0px" }
+      { rootMargin: "-20% 0px -60% 0px" },
     );
 
     const sections = document.querySelectorAll("section[id]");
@@ -32,11 +32,15 @@ export default function Navbar() {
       className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-2xl border-b border-outline-variant/30 transition-all"
     >
       <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
-        
         {/* Themed Logo matching Login/Register styling */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-linear-to-br from-on-primary-container to-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-             <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: '"FILL" 1' }}>recycling</span>
+            <span
+              className="material-symbols-outlined text-xl"
+              style={{ fontVariationSettings: '"FILL" 1' }}
+            >
+              recycling
+            </span>
           </div>
           <div className="text-2xl font-extrabold tracking-tight text-primary font-headline">
             EcoBottle
@@ -70,8 +74,10 @@ export default function Navbar() {
           id="nav-cta"
           className="bg-linear-to-br from-on-primary-container to-primary text-on-primary px-7 py-2.5 rounded-full font-bold shadow-md shadow-primary/20 scale-95 duration-200 transition-transform hover:scale-100 active:scale-95 flex items-center gap-2"
         >
-          <span>Mulai Sekarang</span>
-          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+          <span>Masuk</span>
+          <span className="material-symbols-outlined text-sm">
+            arrow_forward
+          </span>
         </Link>
       </div>
     </nav>
