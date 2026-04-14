@@ -3,9 +3,9 @@ import type { ProcessStep, ImpactStat, NavLink } from "@/types";
 /* ─── Navigation Links ─── */
 export const NAV_LINKS = [
   { label: "Beranda", href: "#hero" },
+  { label: "Dampak", href: "#impact" },
   { label: "Cara Kerja", href: "#process" },
   { label: "Fitur Utama", href: "#features" },
-  { label: "Dampak", href: "#impact" },
 ];
 
 /* ─── Footer Links ─── */

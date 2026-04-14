@@ -19,10 +19,10 @@ export default function StatsCards() {
 
   return (
     <>
-      <section className="md:col-span-2 lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col justify-center border border-transparent hover:border-primary/20 transition-colors">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-secondary-container/50 flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined text-2xl">eco</span>
+      <section className="md:col-span-2 lg:col-span-2 bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col justify-center border border-transparent hover:border-primary/20 transition-colors">
+        <div className="flex items-center gap-3 md:gap-4 mb-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-secondary-container/50 flex items-center justify-center text-primary shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl">eco</span>
           </div>
           <div>
             <p className="text-tertiary text-xs font-semibold">{t("total_bottles")}</p>
@@ -42,10 +42,10 @@ export default function StatsCards() {
         </div>
       </section>
 
-      <section className="md:col-span-2 lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col justify-center">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined text-2xl">stars</span>
+      <section className="md:col-span-2 lg:col-span-2 bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col justify-center">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary shrink-0">
+            <span className="material-symbols-outlined text-xl md:text-2xl">stars</span>
           </div>
           <div>
             <p className="text-tertiary text-xs font-semibold">{t("total_points")}</p>

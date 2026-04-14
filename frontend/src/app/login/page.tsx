@@ -35,6 +35,15 @@ export default function LoginPage() {
     if (!loading && user) router.replace("/dashboard");
   }, [user, loading, router]);
 
+  const handleGoogleCallback = async (response: { credential: string }) => {
+    setIsLoading(true);
+    setError("");
+    const ok = await googleLogin(response.credential);
+    if (ok) router.replace("/dashboard");
+    else setError("Login Google gagal. Coba lagi.");
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     const initGoogle = () => {
       if (window.google && googleBtnRef.current) {
@@ -59,15 +68,6 @@ export default function LoginPage() {
     }, 200);
     return () => clearInterval(timer);
   }, []);
-
-  const handleGoogleCallback = async (response: { credential: string }) => {
-    setIsLoading(true);
-    setError("");
-    const ok = await googleLogin(response.credential);
-    if (ok) router.replace("/dashboard");
-    else setError("Login Google gagal. Coba lagi.");
-    setIsLoading(false);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

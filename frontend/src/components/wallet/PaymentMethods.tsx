@@ -31,7 +31,7 @@ export default function PaymentMethods() {
   }, []);
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+    <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
         <h4 className="font-bold text-on-surface font-headline">{t("payment_methods")}</h4>
         <span className="text-tertiary text-xs font-medium">{channels.length} {t("available_count")}</span>

@@ -25,7 +25,7 @@ export default function TierProgress() {
     : 0;
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+    <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <h4 className="font-bold text-on-surface font-headline mb-2">{t("tier_progression")}</h4>
       <div className="text-tertiary text-xs mb-6 flex items-center">
         {nextTier

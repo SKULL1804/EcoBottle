@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState("hero");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     // Dynamic scroll tracking observer for active links
@@ -23,15 +24,27 @@ export default function Navbar() {
     const sections = document.querySelectorAll("section[id]");
     sections.forEach((section) => observer.observe(section));
 
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
-    <nav
-      id="main-nav"
-      className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-2xl border-b border-outline-variant/30 transition-all"
-    >
-      <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+    <div className={`fixed top-0 w-full z-50 transition-all duration-500 ease-out pointer-events-none ${isScrolled ? 'pt-4 px-4 sm:px-6 md:px-8' : 'pt-0 px-0'}`}>
+      <nav
+        id="main-nav"
+        className={`mx-auto flex justify-between items-center max-w-7xl pointer-events-auto transition-all duration-500 ease-out ${
+          isScrolled
+            ? "bg-surface/95 backdrop-blur-xl border border-outline-variant/30 shadow-[0px_16px_32px_rgba(17,28,45,0.1)] rounded-full px-5 md:px-8 py-3"
+            : "bg-surface/0 border border-transparent px-5 md:px-8 py-5 md:py-8"
+        }`}
+      >
         {/* Themed Logo matching Login/Register styling */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-linear-to-br from-on-primary-container to-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
@@ -75,11 +88,13 @@ export default function Navbar() {
           className="bg-linear-to-br from-on-primary-container to-primary text-on-primary px-7 py-2.5 rounded-full font-bold shadow-md shadow-primary/20 scale-95 duration-200 transition-transform hover:scale-100 active:scale-95 flex items-center gap-2"
         >
           <span>Masuk</span>
-          <span className="material-symbols-outlined text-sm">
-            arrow_forward
-          </span>
+          <div className="hidden lg:flex">
+            <span className="material-symbols-outlined text-sm">
+              arrow_forward
+            </span>
+          </div>
         </Link>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }

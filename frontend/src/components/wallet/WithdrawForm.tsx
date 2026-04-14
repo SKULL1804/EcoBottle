@@ -68,7 +68,7 @@ export default function WithdrawForm() {
         <h3 className="text-2xl font-black font-headline text-on-surface mb-2">Withdraw Berhasil!</h3>
         <p className="text-tertiary text-sm mb-1">{formatRupiah(numericAmount)} sedang diproses ke <span className="font-bold text-on-surface">{WALLET_OPTIONS.find(w => w.code === selectedWallet)?.name}</span></p>
         <p className="text-tertiary text-xs mb-8">Estimasi tiba: {selectedOption?.duration}</p>
-        <div className="bg-surface-container-lowest rounded-2xl p-6 w-full max-w-sm shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 w-full max-w-sm shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="space-y-3">
             <div className="flex justify-between text-sm"><span className="text-tertiary">Jumlah</span><span className="font-bold text-on-surface">{formatRupiah(numericAmount)}</span></div>
             <div className="flex justify-between text-sm"><span className="text-tertiary">Biaya</span><span className="font-bold text-on-surface">{fee === 0 ? "Gratis" : formatRupiah(fee)}</span></div>
@@ -100,7 +100,7 @@ export default function WithdrawForm() {
     const wallet = WALLET_OPTIONS.find(w => w.code === selectedWallet);
     return (
       <div className="max-w-lg mx-auto">
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"><span className="material-symbols-outlined text-primary text-2xl">receipt_long</span></div>
             <h4 className="font-bold text-on-surface font-headline text-lg">Konfirmasi Penarikan</h4>
@@ -128,9 +128,9 @@ export default function WithdrawForm() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 md:p-6">
       <div className="lg:col-span-3 space-y-6">
-        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-6 text-on-primary shadow-xl relative overflow-hidden">
+        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-5 md:p-6 text-on-primary shadow-xl relative overflow-hidden">
           <div className="absolute -top-14 -right-14 w-40 h-40 bg-primary-fixed/8 rounded-full blur-3xl" />
           <div className="relative z-10 flex items-center justify-between">
             <div><p className="text-primary-fixed/60 text-xs font-medium mb-1">Saldo Tersedia</p><h3 className="text-3xl font-black font-headline tracking-tight">{formatRupiah(balance)}</h3></div>
@@ -138,7 +138,7 @@ export default function WithdrawForm() {
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 bg-primary/10 rounded-xl flex items-center justify-center"><span className="material-symbols-outlined text-primary text-xl">payments</span></div>
             <div><h4 className="font-bold text-on-surface font-headline">Jumlah Penarikan</h4><p className="text-tertiary text-xs">Minimum Rp 5.000</p></div>
@@ -157,7 +157,7 @@ export default function WithdrawForm() {
           {numericAmount > balance && <p className="text-error text-xs mt-3 flex items-center gap-1"><span className="material-symbols-outlined text-sm">error</span>Saldo tidak mencukupi</p>}
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Detail Rekening</h4>
           <div className="space-y-4">
             <div><label className="block text-tertiary text-xs font-semibold mb-2">Nomor Akun / HP</label><input type="text" value={accountNumber} onChange={e => setAccountNumber(e.target.value)} placeholder="08123456789" className="w-full px-4 py-3 bg-surface rounded-xl border border-outline-variant/30 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" /></div>
@@ -165,7 +165,7 @@ export default function WithdrawForm() {
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Metode Penarikan</h4>
           <div className="space-y-3">
             {WITHDRAW_OPTIONS.map((opt) => (
@@ -189,7 +189,7 @@ export default function WithdrawForm() {
       </div>
 
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Tujuan Penarikan</h4>
           <div className="space-y-2">
             {WALLET_OPTIONS.map((w) => (
@@ -203,7 +203,7 @@ export default function WithdrawForm() {
         </div>
 
         {numericAmount > 0 && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+          <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
             <h4 className="font-bold text-on-surface font-headline mb-4">Ringkasan</h4>
             <div className="space-y-3">
               <div className="flex justify-between text-sm"><span className="text-tertiary">Jumlah</span><span className="font-bold text-on-surface">{formatRupiah(numericAmount)}</span></div>
@@ -214,7 +214,7 @@ export default function WithdrawForm() {
           </div>
         )}
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Informasi</h4>
           <div className="space-y-4">
             {[{ icon: "info", text: "Minimum penarikan Rp 5.000" }, { icon: "schedule", text: "Penarikan regular diproses 1-2 hari kerja" }, { icon: "verified_user", text: "Semua transaksi dilindungi enkripsi" }].map((info) => (

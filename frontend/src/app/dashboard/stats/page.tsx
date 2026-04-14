@@ -18,11 +18,18 @@ export default function StatsPage() {
   return (
     <>
       {/* Header */}
-      <PageHeader
-        titleKey="stats_page_title"
-        descKey="stats_page_desc"
-        rightElement={<MonthPicker />}
-      />
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6 md:mb-8">
+        <div>
+          <PageHeader
+            titleKey="stats_page_title"
+            descKey="stats_page_desc"
+            className="mb-0"
+          />
+        </div>
+        <div className="shrink-0 sm:pt-1">
+          <MonthPicker />
+        </div>
+      </div>
 
       {/* Overview Cards */}
       <StatsOverview />

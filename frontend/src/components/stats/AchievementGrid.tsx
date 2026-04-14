@@ -35,7 +35,7 @@ export default function AchievementGrid() {
   const earnedTitles = new Set(earned.map(a => a.title));
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+    <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
         <h4 className="font-bold text-on-surface font-headline">{t("achievements") || "Achievements"}</h4>
         <span className="text-tertiary text-xs font-medium">{earned.length}/{ALL_ACHIEVEMENTS.length} {t("unlocked") || "Unlocked"}</span>
