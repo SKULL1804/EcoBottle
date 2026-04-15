@@ -16,16 +16,16 @@ export default function WithdrawForm() {
   const [accountNumber, setAccountNumber] = useState(user?.phone || "");
   const [accountName, setAccountName] = useState(user?.name || "");
   const [amount, setAmount] = useState("");
-  const [selectedSpeed, setSelectedSpeed] = useState("Regular");
+
   const [step, setStep] = useState<"form" | "confirm" | "success" | "error">("form");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [txResult, setTxResult] = useState<{ transaction_id: string; new_balance: number } | null>(null);
 
   const numericAmount = parseInt(amount.replace(/\D/g, "") || "0", 10);
-  const selectedOption = WITHDRAW_OPTIONS.find((o) => o.label === selectedSpeed);
-  const fee = selectedSpeed === "Instant" ? 1000 : 0;
-  const totalDeducted = numericAmount + fee;
+  const selectedOption = WITHDRAW_OPTIONS[0];
+  const fee = 0;
+  const totalDeducted = numericAmount;
   const isValid = numericAmount >= 5000 && numericAmount <= balance && accountNumber !== "" && accountName !== "";
 
   const formatRupiah = (val: number) => `Rp ${val.toLocaleString("id-ID")}`;
@@ -71,7 +71,7 @@ export default function WithdrawForm() {
         <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 w-full max-w-sm shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="space-y-3">
             <div className="flex justify-between text-sm"><span className="text-tertiary">Jumlah</span><span className="font-bold text-on-surface">{formatRupiah(numericAmount)}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-tertiary">Biaya</span><span className="font-bold text-on-surface">{fee === 0 ? "Gratis" : formatRupiah(fee)}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-tertiary">Biaya</span><span className="font-bold text-primary">Gratis</span></div>
             <div className="border-t border-outline-variant/15 pt-3 flex justify-between text-sm"><span className="text-tertiary">Sisa Saldo</span><span className="font-bold text-primary">{formatRupiah(txResult?.new_balance ?? 0)}</span></div>
           </div>
         </div>
@@ -110,7 +110,6 @@ export default function WithdrawForm() {
             <div className="flex justify-between items-center"><span className="text-tertiary text-sm">Tujuan</span><span className="font-bold text-on-surface text-sm">{wallet?.name} ({accountNumber})</span></div>
             <div className="border-t border-outline-variant/10" />
             <div className="flex justify-between"><span className="text-tertiary text-sm">Jumlah</span><span className="font-bold text-on-surface text-sm">{formatRupiah(numericAmount)}</span></div>
-            <div className="flex justify-between"><span className="text-tertiary text-sm">Biaya</span><span className={`font-bold text-sm ${fee === 0 ? "text-primary" : "text-tertiary"}`}>{fee === 0 ? "Gratis" : formatRupiah(fee)}</span></div>
             <div className="flex justify-between"><span className="text-tertiary text-sm">Estimasi</span><span className="font-bold text-on-surface text-sm">{selectedOption?.duration}</span></div>
             <div className="border-t border-outline-variant/10" />
             <div className="flex justify-between"><span className="font-bold text-on-surface text-sm">Total Dipotong</span><span className="font-black text-primary text-lg font-headline">{formatRupiah(totalDeducted)}</span></div>
@@ -165,23 +164,7 @@ export default function WithdrawForm() {
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
-          <h4 className="font-bold text-on-surface font-headline mb-4">Metode Penarikan</h4>
-          <div className="space-y-3">
-            {WITHDRAW_OPTIONS.map((opt) => (
-              <button key={opt.label} onClick={() => setSelectedSpeed(opt.label)} className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedSpeed === opt.label ? "border-primary bg-primary/5 shadow-sm" : "border-transparent bg-surface hover:border-outline-variant/15"}`}>
-                <div className="flex items-center gap-4">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${selectedSpeed === opt.label ? "bg-primary text-on-primary" : "bg-primary/10 text-primary"}`}><span className="material-symbols-outlined text-xl">{opt.icon}</span></div>
-                  <div className="text-left"><p className="font-bold text-on-surface text-sm">{opt.label}</p><p className="text-tertiary text-[11px]">{opt.duration}</p></div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold ${opt.fee === "Gratis" ? "text-primary" : "text-tertiary"}`}>{opt.fee}</span>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedSpeed === opt.label ? "border-primary bg-primary" : "border-outline-variant"}`}>{selectedSpeed === opt.label && <div className="w-2 h-2 bg-surface-container-lowest rounded-full" />}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         <button onClick={() => isValid && setStep("confirm")} disabled={!isValid} className={`w-full py-4 font-bold rounded-xl text-sm shadow-lg flex items-center justify-center gap-2 transition-all ${isValid ? "gradient-primary text-on-primary shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]" : "bg-surface-container-high text-outline cursor-not-allowed shadow-none"}`}>
           <span className="material-symbols-outlined text-lg">send</span>Lanjut ke Konfirmasi
@@ -207,7 +190,7 @@ export default function WithdrawForm() {
             <h4 className="font-bold text-on-surface font-headline mb-4">Ringkasan</h4>
             <div className="space-y-3">
               <div className="flex justify-between text-sm"><span className="text-tertiary">Jumlah</span><span className="font-bold text-on-surface">{formatRupiah(numericAmount)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-tertiary">Biaya ({selectedSpeed})</span><span className={`font-bold ${fee === 0 ? "text-primary" : "text-on-surface"}`}>{fee === 0 ? "Gratis" : formatRupiah(fee)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-tertiary">Biaya</span><span className="font-bold text-primary">Gratis</span></div>
               <div className="border-t border-outline-variant/15 pt-3 flex justify-between"><span className="font-bold text-on-surface text-sm">Total Diterima</span><span className="font-black text-primary text-lg font-headline">{formatRupiah(numericAmount)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-tertiary">Sisa Saldo</span><span className="font-bold text-on-surface">{formatRupiah(Math.max(0, balance - totalDeducted))}</span></div>
             </div>
@@ -217,7 +200,7 @@ export default function WithdrawForm() {
         <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Informasi</h4>
           <div className="space-y-4">
-            {[{ icon: "info", text: "Minimum penarikan Rp 5.000" }, { icon: "schedule", text: "Penarikan regular diproses 1-2 hari kerja" }, { icon: "verified_user", text: "Semua transaksi dilindungi enkripsi" }].map((info) => (
+            {[{ icon: "info", text: "Minimum penarikan Rp 5.000" }, { icon: "schedule", text: "Penarikan diproses 1-3 hari kerja" }, { icon: "verified_user", text: "Semua transaksi dilindungi enkripsi" }].map((info) => (
               <div key={info.text} className="flex gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><span className="material-symbols-outlined text-primary text-sm">{info.icon}</span></div>
                 <p className="text-tertiary text-xs leading-relaxed">{info.text}</p>

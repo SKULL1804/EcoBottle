@@ -19,12 +19,11 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
 
 /* ─── Withdraw Options ─── */
 export const WITHDRAW_OPTIONS: WithdrawOption[] = [
-  { icon: "bolt", label: "Instant", fee: "Rp 1.000", duration: "< 1 menit" },
   {
-    icon: "schedule",
-    label: "Regular",
+    icon: "send",
+    label: "Payout",
     fee: "Gratis",
-    duration: "1-2 hari kerja",
+    duration: "1-3 hari kerja",
   },
 ];
 
