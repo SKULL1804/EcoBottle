@@ -597,8 +597,8 @@ export default function ScanViewport() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <div className="lg:col-span-3 flex flex-col gap-6">
-        <div className="bg-gradient-to-br from-on-primary-container to-primary rounded-2xl p-1 shadow-xl">
-          <div className="bg-on-primary-container/90 rounded-xl overflow-hidden relative aspect-[4/3]">
+        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-1 shadow-xl">
+          <div className="bg-on-primary-container/90 rounded-xl overflow-hidden relative aspect-4/3">
             <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" style={{ display: state !== "IDLE" ? "block" : "none" }} />
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ display: state !== "IDLE" ? "block" : "none" }} />
             {state === "IDLE" && (
@@ -691,7 +691,7 @@ export default function ScanViewport() {
 
       <div className="lg:col-span-2 flex flex-col gap-6">
         {(state === "READY" || state === "SCANNING") && detections.length > 0 && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
+          <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl">eco</span></div>
               <div><h4 className="font-bold text-on-surface font-headline">{t("bottle_detected")}</h4><p className="text-tertiary text-xs">{t("preview_unconfirmed")}</p></div>
@@ -727,7 +727,7 @@ export default function ScanViewport() {
         )}
 
         {state === "CONFIRMED" && confirmResult && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
+          <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] border border-primary/10">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2.5 bg-primary-container/20 rounded-xl"><span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span></div>
               <div><h4 className="font-bold text-on-surface font-headline">{t("success_submitted")}</h4><p className="text-tertiary text-xs">{analyzeResult?.total_items ?? 0} {t("bottles_confirmed")}</p></div>
@@ -772,7 +772,7 @@ export default function ScanViewport() {
         )}
 
         {state === "IDLE" && (
-          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+          <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
             <h4 className="font-bold text-on-surface font-headline mb-4">{t("how_to_scan")}</h4>
             <div className="space-y-4">
               {[

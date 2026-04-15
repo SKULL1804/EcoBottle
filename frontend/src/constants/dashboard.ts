@@ -13,6 +13,7 @@ export const SIDE_NAV_ITEMS: SideNavItem[] = [
 export const BOTTOM_NAV_ITEMS: BottomNavItem[] = [
   { icon: "home", label: "Home", href: "/dashboard" },
   { icon: "center_focus_weak", label: "Scan", href: "/dashboard/scan" },
+  { icon: "bar_chart", label: "Stats", href: "/dashboard/stats" },
   { icon: "payments", label: "Wallet", href: "/dashboard/wallet" },
   { icon: "person", label: "Profile", href: "/dashboard/profile" },
 ];

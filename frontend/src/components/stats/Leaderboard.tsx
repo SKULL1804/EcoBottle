@@ -23,7 +23,7 @@ export default function Leaderboard() {
   const userRank = data?.user_rank || 0;
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+    <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
         <h4 className="font-bold text-on-surface font-headline">{t("leaderboard") || "Leaderboard"}</h4>
         {userRank > 0 && <span className="text-tertiary text-xs font-medium">{t("your_rank") || "Peringkat kamu:"} #{userRank}</span>}

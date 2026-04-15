@@ -25,7 +25,7 @@ export default function WalletTransactions() {
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString("id", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+    <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
       <div className="flex justify-between items-center mb-6">
         <h4 className="font-bold text-on-surface font-headline">Transaksi Terakhir</h4>
         <Link href="/dashboard/history" className="text-primary text-xs font-bold hover:underline">Lihat Semua</Link>

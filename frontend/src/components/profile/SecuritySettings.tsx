@@ -53,7 +53,7 @@ export default function SecuritySettings() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <div className="lg:col-span-3 space-y-6">
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 bg-primary/10 rounded-xl flex items-center justify-center"><span className="material-symbols-outlined text-primary text-xl">lock</span></div>
             <div><h4 className="font-bold text-on-surface font-headline">Ubah Password</h4><p className="text-tertiary text-xs">Pastikan password baru aman</p></div>
@@ -106,7 +106,7 @@ export default function SecuritySettings() {
       </div>
 
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-6 text-on-primary shadow-xl relative overflow-hidden">
+        <div className="bg-linear-to-br from-on-primary-container to-primary rounded-2xl p-5 md:p-6 text-on-primary shadow-xl relative overflow-hidden">
           <div className="absolute -top-14 -right-14 w-40 h-40 bg-primary-fixed/8 rounded-full blur-3xl" />
           <div className="relative z-10 text-center">
             <div className="w-16 h-16 mx-auto bg-surface-container-lowest/15 backdrop-blur-sm rounded-full flex items-center justify-center mb-4">
@@ -117,7 +117,7 @@ export default function SecuritySettings() {
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Tips Keamanan</h4>
           <div className="space-y-4">
             {SECURITY_TIPS.map((tip) => (
@@ -129,7 +129,7 @@ export default function SecuritySettings() {
           </div>
         </div>
 
-        <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+        <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <h4 className="font-bold text-on-surface font-headline mb-4">Info Akun</h4>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-surface rounded-xl">

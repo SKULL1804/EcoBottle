@@ -3,14 +3,17 @@ import { PROCESS_STEPS } from "@/constants/landing";
 
 export default function ProcessSection() {
   return (
-    <section id="process" className="max-w-7xl mx-auto px-8 py-20 relative z-10">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <section id="process" className="max-w-7xl mx-auto px-5 md:px-8 py-16 md:py-20 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 group/list">
         {PROCESS_STEPS.map((step) => (
           <div
             key={step.title}
-            className={`p-8 rounded-3xl flex flex-col justify-between min-h-100 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] transition-all duration-300 relative overflow-hidden group ${
+            className={`p-6 md:p-8 rounded-3xl flex flex-col justify-between min-h-100 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] relative overflow-hidden group transition-all duration-500 ease-out
+              max-md:group-hover/list:opacity-40 max-md:group-hover/list:scale-[0.98] 
+              max-md:hover:!opacity-100 max-md:hover:!scale-105 max-md:hover:!z-30 max-md:hover:shadow-[0px_32px_64px_rgba(3,101,46,0.2)]
+              ${
               step.accent 
-                ? "bg-linear-to-br from-on-primary-container to-primary text-on-primary border border-transparent scale-[1.01] md:scale-105 z-20 shadow-primary/30 shadow-2xl" 
+                ? "bg-linear-to-br from-on-primary-container to-primary text-on-primary border border-transparent z-20 md:scale-105 md:shadow-primary/30 md:shadow-2xl" 
                 : "bg-surface-container-lowest text-on-surface border border-outline-variant/30 hover:border-primary/20 hover:shadow-lg"
             }`}
           >

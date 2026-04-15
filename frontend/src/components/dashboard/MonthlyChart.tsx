@@ -4,7 +4,7 @@ export default function MonthlyChart() {
   const opacitySteps = [10, 20, 40, 60, 100];
 
   return (
-    <section className="md:col-span-4 lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col overflow-hidden">
+    <section className="md:col-span-4 lg:col-span-2 bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)] flex flex-col overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <h4 className="font-bold text-on-surface font-headline">
           Monthly Progress

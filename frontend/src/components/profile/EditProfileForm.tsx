@@ -41,7 +41,7 @@ export default function EditProfileForm() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+      <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
         <h4 className="font-bold text-on-surface font-headline mb-6">Foto Profil</h4>
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full overflow-hidden relative border-4 border-primary/20 shadow-lg flex items-center justify-center bg-primary-container">
@@ -57,7 +57,7 @@ export default function EditProfileForm() {
         </div>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+      <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
         <h4 className="font-bold text-on-surface font-headline mb-6">Informasi Pribadi</h4>
         <div className="space-y-5">
           <div>
@@ -85,7 +85,7 @@ export default function EditProfileForm() {
         </div>
       </div>
 
-      <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
+      <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
         <h4 className="font-bold text-on-surface font-headline mb-6">Info Akun</h4>
         <div className="space-y-3">
           <div className="flex justify-between items-center p-4 bg-surface rounded-xl">
