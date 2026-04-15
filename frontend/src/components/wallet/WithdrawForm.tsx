@@ -110,7 +110,6 @@ export default function WithdrawForm() {
             <div className="flex justify-between items-center"><span className="text-tertiary text-sm">Tujuan</span><span className="font-bold text-on-surface text-sm">{wallet?.name} ({accountNumber})</span></div>
             <div className="border-t border-outline-variant/10" />
             <div className="flex justify-between"><span className="text-tertiary text-sm">Jumlah</span><span className="font-bold text-on-surface text-sm">{formatRupiah(numericAmount)}</span></div>
-            <div className="flex justify-between"><span className="text-tertiary text-sm">Estimasi</span><span className="font-bold text-on-surface text-sm">{selectedOption?.duration}</span></div>
             <div className="border-t border-outline-variant/10" />
             <div className="flex justify-between"><span className="font-bold text-on-surface text-sm">Total Dipotong</span><span className="font-black text-primary text-lg font-headline">{formatRupiah(totalDeducted)}</span></div>
           </div>
