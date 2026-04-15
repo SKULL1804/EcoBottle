@@ -67,7 +67,6 @@ export default function WithdrawForm() {
         </div>
         <h3 className="text-2xl font-black font-headline text-on-surface mb-2">Withdraw Berhasil!</h3>
         <p className="text-tertiary text-sm mb-1">{formatRupiah(numericAmount)} sedang diproses ke <span className="font-bold text-on-surface">{WALLET_OPTIONS.find(w => w.code === selectedWallet)?.name}</span></p>
-        <p className="text-tertiary text-xs mb-8">Estimasi tiba: {selectedOption?.duration}</p>
         <div className="bg-surface-container-lowest rounded-2xl p-5 md:p-6 w-full max-w-sm shadow-[0px_24px_48px_rgba(17,28,45,0.06)]">
           <div className="space-y-3">
             <div className="flex justify-between text-sm"><span className="text-tertiary">Jumlah</span><span className="font-bold text-on-surface">{formatRupiah(numericAmount)}</span></div>
