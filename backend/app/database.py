@@ -9,9 +9,16 @@ from app.config import get_settings
 
 settings = get_settings()
 
+
+def _normalize_database_url(url: str) -> str:
+    """Ensure PostgreSQL uses an async driver when running with SQLAlchemy asyncio."""
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return url
+
 # Create async engine
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _normalize_database_url(settings.DATABASE_URL),
     echo=settings.DEBUG,
     # SQLite needs this for async
     connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
